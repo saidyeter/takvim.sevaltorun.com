@@ -54,23 +54,23 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-[#15162c]">
-        <div className="flex flex-col items-start justify-center">
+        <div className="flex w-full flex-col items-start justify-center p-4 md:p-0 md:w-[720px]">
           {!!months && (
             <>
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="p-4 text-2xl font-bold text-white">
                 {months.previousName} {year}
               </h3>
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="p-4 text-2xl font-bold text-white">
                 {months.currentName} {year}
               </h3>
               {!!events && (
-                <div className="flex max-w-xl flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20">
+                <div className="flex w-full flex-col gap-4 rounded-xl  bg-white/10 p-4 text-white">
                   {cal.map((week, index) => {
                     return <WeekRow key={index} week={week} />;
                   })}
                 </div>
               )}
-              <h3 className="text-2xl font-bold text-white">
+              <h3 className="p-4 text-2xl  font-bold text-white">
                 {months.nextName} {year}
               </h3>
             </>
@@ -83,7 +83,7 @@ const Home: NextPage = () => {
 
 function WeekRow(props: { week: number[] }) {
   return (
-    <div className="flex ">
+    <div className="flex w-full justify-around">
       {props.week.map((day, index) => (
         <WeekCell key={index} day={day} desc="sfd" />
       ))}
@@ -92,7 +92,7 @@ function WeekRow(props: { week: number[] }) {
 }
 function WeekCell(props: { day: number; desc: string }) {
   return (
-    <div className="flex h-16 w-16 flex-col items-center justify-center text-2xl">
+    <div className="flex w-full flex-col items-center justify-center text-2xl hover:bg-white/20">
       {props.day === -1 ? (
         <></>
       ) : (
