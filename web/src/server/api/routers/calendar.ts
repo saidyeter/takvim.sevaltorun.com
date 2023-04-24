@@ -9,20 +9,21 @@ export const calendarRouter = createTRPCRouter({
       year: z.number().min(2022).max(2025),
       month: z.number().min(1).max(12)
     }))
-    .query(({ ctx,input }) => {
-      const boundaries= dater.getMonthBoundaries(input.year, input.month)
-      
+    .query(async ({ ctx, input }) => {
+      const boundaries = dater.getMonthBoundaries(input.year, input.month)
+      const events= await ctx.prisma.event.findMany({})
       return {
-        ...boundaries
+        ...boundaries,
+        events
       }
     }),
 
   getMonths: publicProcedure
-  .query(({ ctx,input }) => {
-    const months= dater.getMonths()
-    
-    return {
-      ...months
-    }
-  }),
+    .query(({ ctx, input }) => {
+      const months = dater.getMonths()
+
+      return {
+        ...months
+      }
+    }),
 });
