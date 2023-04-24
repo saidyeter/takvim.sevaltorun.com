@@ -12,7 +12,7 @@ const Home: NextPage = () => {
   const [year, setYear] = useState(date.getFullYear());
   const { data: months, isLoading: monthsLoading } =
     api.calendar.getMonths.useQuery();
-  const { data: events, isLoading: eventsLoading } =
+  const { data: monthlyEvents, isLoading: eventsLoading } =
     api.calendar.getMonthlyEvents.useQuery(
       {
         month: 4,
@@ -24,14 +24,18 @@ const Home: NextPage = () => {
     );
 
   useEffect(() => {
-    if (!events) {
+    if (!monthlyEvents) {
       return;
     }
     const weeks: number[][] = [];
     let week: number[] = [];
     let counter = 1;
-    for (let i = 1; i < events.monthLength + events.startWeekDay; i++) {
-      if (i < events.startWeekDay) {
+    for (
+      let i = 1;
+      i < monthlyEvents.monthLength + monthlyEvents.startWeekDay;
+      i++
+    ) {
+      if (i < monthlyEvents.startWeekDay) {
         week.push(-1);
       } else {
         week.push(counter);
@@ -44,7 +48,7 @@ const Home: NextPage = () => {
     }
     console.log(weeks);
     setCal(weeks);
-  }, [events]);
+  }, [monthlyEvents]);
 
   return (
     <>
@@ -54,7 +58,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-[#15162c]">
-        <div className="flex w-full flex-col items-start justify-center p-4 md:p-0 md:w-[720px]">
+        <div className="flex w-full flex-col items-start justify-center p-4 md:w-[720px] md:p-0">
           {!!months && (
             <>
               <h3 className="p-4 text-2xl font-bold text-white">
@@ -63,12 +67,24 @@ const Home: NextPage = () => {
               <h3 className="p-4 text-2xl font-bold text-white">
                 {months.currentName} {year}
               </h3>
-              {!!events && (
-                <div className="flex w-full flex-col gap-4 rounded-xl  bg-white/10 p-4 text-white">
-                  {cal.map((week, index) => {
-                    return <WeekRow key={index} week={week} />;
-                  })}
-                </div>
+              {!!monthlyEvents && (
+                <>
+                  <div className="flex w-full flex-col gap-4 rounded-xl  bg-white/10 p-4 text-white">
+                    {cal.map((week, index) => {
+                      return <WeekRow key={index} week={week} />;
+                    })}
+                  </div>
+
+                  <div className="flex w-full flex-col gap-4 rounded-xl  bg-white/10 p-4 text-white">
+                    {monthlyEvents.events.map((value, index) => {
+                      return (
+                        <div key={index}>
+                          <p>{value.desc}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
               <h3 className="p-4 text-2xl  font-bold text-white">
                 {months.nextName} {year}
