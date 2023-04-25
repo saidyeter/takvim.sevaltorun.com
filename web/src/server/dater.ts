@@ -1,10 +1,8 @@
-export default {
+const methods = {
     getMonthBoundaries,
     getMonths
 }
-
-//new Date(2023, 1, 1)
-//new Date(2023, 12, 1)
+export default methods
 
 function getMonthBoundaries(year: number, month: number) {
     const date = new Date(year, month - 1, 1)

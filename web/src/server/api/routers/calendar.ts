@@ -20,7 +20,7 @@ export const calendarRouter = createTRPCRouter({
 
   getRelatedMonths: publicProcedure
     .input(allowedDate)
-    .query(({ ctx, input }) => {
+    .query(({ input }) => {
       const months = dater.getMonths(input.year,input.monthIndex)
 
       return {
