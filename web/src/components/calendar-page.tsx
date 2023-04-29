@@ -12,7 +12,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
   });
   const { data: monthlyEvents } = api.calendar.getMonthlyEvents.useQuery(
     {
-      ...props
+      ...props,
     },
     {
       enabled: !!months,
@@ -64,25 +64,27 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
         )}
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        <div className="flex w-full flex-col items-start justify-center p-4 md:w-[720px] md:p-0">
+        <div className="flex w-full flex-col items-center  p-4 md:w-[720px] md:p-0">
           {!!months && (
             <>
-              <div className="flex w-full justify-between">
+              <div className="flex w-full justify-between items-center">
                 <Link
                   href={`${months.previousDate.year}-${months.previousDate.month}`}
                 >
-                  <h3 className="text-2xl font-bold text-white">
-                    &lt; {months.previousDate.monthName}{" "}
-                    {months.previousDate.year}
-                  </h3>
+                  <div className="flex flex-col items-center justify-center text-xl text-slate-200">
+                    <span>{months.previousDate.monthName}</span>
+                    <span>{months.previousDate.year}</span>
+                  </div>
                 </Link>
-                <h3 className="text-2xl font-bold text-white">
-                  {months.selectedDate.monthName} {months.selectedDate.year}
-                </h3>
+                <div className="flex flex-col items-center justify-center text-2xl font-bold text-white">
+                  <span>{months.selectedDate.monthName}</span>
+                  <span>{months.selectedDate.year}</span>
+                </div>
                 <Link href={`${months.nextDate.year}-${months.nextDate.month}`}>
-                  <h3 className="text-2xl  font-bold text-white">
-                    {months.nextDate.monthName} {months.nextDate.year} &gt;
-                  </h3>
+                  <div className="flex flex-col items-center justify-center text-xl text-slate-200">
+                    <span>{months.nextDate.monthName}</span>
+                    <span>{months.nextDate.year}</span>
+                  </div>
                 </Link>
               </div>
               {!!monthlyEvents && (
