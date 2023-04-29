@@ -5,7 +5,7 @@ const methods = {
 export default methods
 
 function getMonthBoundaries(year: number, month: number) {
-    const date = new Date(year, month - 1, 1)
+    const date = new Date(year, month, 1)
     const startWeekDay = date.getDay()
     date.setMonth(date.getMonth() + 1)
     date.setDate(date.getDate() - 1)
