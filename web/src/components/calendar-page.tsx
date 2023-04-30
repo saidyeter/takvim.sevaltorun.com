@@ -2,9 +2,14 @@ import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
+import type { Event } from "@prisma/client";
+type CellProps = {
+  dayNumber: number;
+  color?: string;
+};
 
 const CalendarPage = (props: { year: number; monthIndex: number }) => {
-  const [cal, setCal] = useState([] as number[][]);
+  const [cal, setCal] = useState([] as CellProps[][]);
 
   const { data: months } = api.calendar.getRelatedMonths.useQuery({
     year: props.year,
@@ -23,19 +28,33 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
     if (!monthlyEvents) {
       return;
     }
-    const weeks: number[][] = [];
-    let week: number[] = [];
-    let counter = 1;
+    const weeks: CellProps[][] = [];
+    let week: CellProps[] = [];
+    let dayNumber = 1;
     for (
       let i = 1;
       i < monthlyEvents.monthLength + monthlyEvents.startWeekDay;
       i++
     ) {
       if (i < monthlyEvents.startWeekDay) {
-        week.push(-1);
+        week.push({
+          dayNumber: -1,
+        });
       } else {
-        week.push(counter);
-        counter++;
+        let color: string | undefined = undefined;
+        const foundEvent = monthlyEvents.events.find(
+          (e) =>
+            e.starts.getDate() <= dayNumber && e.ends.getDate() >= dayNumber
+        );
+
+        if (foundEvent) {
+          color = isColor(foundEvent.color) ? foundEvent.color : "white";
+        }
+        week.push({
+          dayNumber,
+          color,
+        });
+        dayNumber++;
       }
       if (i > 0 && week.length % 7 == 0) {
         weeks.push(week);
@@ -44,7 +63,9 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
     }
     if (week.length > 0) {
       while (week.length % 7 != 0) {
-        week.push(-1);
+        week.push({
+          dayNumber: -1,
+        });
       }
       weeks.push(week);
     }
@@ -56,9 +77,13 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
     <>
       <Head>
         {!!months ? (
-          <title>
-            Takvim | {months.selectedDate.monthName} {months.selectedDate.year}
-          </title>
+          <>
+            <title>
+              Takvim | {months.selectedDate.monthName}{" "}
+              {months.selectedDate.year}
+            </title>
+            <style>{getCssVariables(monthlyEvents?.events ?? [])}</style>
+          </>
         ) : (
           <title>Takvim</title>
         )}
@@ -67,11 +92,11 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
         <div className="flex w-full flex-col items-center  p-4 md:w-[720px] md:p-0">
           {!!months && (
             <>
-              <div className="flex w-full justify-between items-center">
+              <div className="flex w-full items-end justify-between">
                 <Link
                   href={`${months.previousDate.year}-${months.previousDate.month}`}
                 >
-                  <div className="flex flex-col items-center justify-center text-xl text-slate-200">
+                  <div className="flex flex-col items-center justify-center text-xl text-slate-400 hover:text-slate-200">
                     <span>{months.previousDate.monthName}</span>
                     <span>{months.previousDate.year}</span>
                   </div>
@@ -81,7 +106,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
                   <span>{months.selectedDate.year}</span>
                 </div>
                 <Link href={`${months.nextDate.year}-${months.nextDate.month}`}>
-                  <div className="flex flex-col items-center justify-center text-xl text-slate-200">
+                  <div className="flex flex-col items-center justify-center text-xl text-slate-400 hover:text-slate-200">
                     <span>{months.nextDate.monthName}</span>
                     <span>{months.nextDate.year}</span>
                   </div>
@@ -95,11 +120,18 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
                     })}
                   </div>
 
-                  <div className="mt-4 flex w-full flex-col gap-4  rounded-xl bg-white/10 p-4  text-white">
+                  <div className="mt-2 flex w-full flex-col gap-1">
                     {monthlyEvents.events.map((value, index) => {
                       return (
-                        <div key={index}>
-                          <p>{value.desc}</p>
+                        <div
+                          key={index}
+                          className={`flex w-full flex-col gap-1 border-l-4 bg-white/10 p-2 pl-4 text-white`}
+                          style={{ borderColor: value.color }}
+                        >
+                          <p className="text-slate-300 font-light">
+                            {getLocaleDate(value.starts)}-{getLocaleDate(value.ends)}
+                          </p>
+                          <p className="font-semibold">{value.desc}</p>
                         </div>
                       );
                     })}
@@ -114,30 +146,68 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
   );
 };
 
-function WeekRow(props: { week: number[] }) {
+function WeekRow(props: { week: CellProps[] }) {
   return (
     <div className="flex w-full justify-around">
       {props.week.map((day, index) => (
-        <WeekCell key={index} day={day} desc="sfd" />
+        <WeekCell key={index} day={day.dayNumber} color={day.color} />
       ))}
     </div>
   );
 }
-function WeekCell(props: { day: number; desc: string }) {
+function WeekCell(props: { day: number; color?: string }) {
   return (
-    <div className="flex w-full flex-col items-center justify-center text-2xl hover:bg-white/20">
-      {props.day === -1 ? (
-        <></>
-      ) : (
-        <>
-          <span>{props.day}</span>
-          <span title={props.desc} className="hover:cursor-pointer">
-            {!!props.desc && "·"}
-          </span>
-        </>
-      )}
-    </div>
+    <>
+      <div className="relative flex h-16 w-full flex-col items-center justify-center rounded-md  text-2xl hover:bg-white/10">
+        {props.day === -1 ? (
+          <></>
+        ) : (
+          <>
+            <span>{props.day}</span>
+            {props.color && (
+              <div
+                style={{ backgroundColor: props.color }}
+                className="absolute right-3 top-3 h-2 w-2 rounded-full"
+              />
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
+}
+
+function getLocaleDate(ms: Date) {
+  return ms
+    .toLocaleDateString("tr-TR", {
+      // year: "numeric",
+      month: "long",
+      day: "numeric",
+      // dateStyle:'long'
+    })
+  
+}
+
+function isColor(strColor: string) {
+  const s = new Option().style;
+  s.color = strColor;
+  return s.color !== "";
+}
+
+function getCssVariables(events: Event[]) {
+  const allColors = events.map((e) => {
+    return {
+      cssName: "event-" + e.id,
+      color: isColor(e.color) ? e.color : "white",
+    };
+  });
+  //<style>:root {`{--text-color: #9E6F21;}`}</style>
+  let styleTag = ":root {";
+  allColors.forEach((c) => {
+    styleTag += `--${c.cssName}: ${c.color};`;
+  });
+  styleTag += "}";
+  return styleTag;
 }
 
 export default CalendarPage;
