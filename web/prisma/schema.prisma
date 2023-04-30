@@ -13,6 +13,5 @@ model Event {
     desc      String
     starts    DateTime
     ends      DateTime
-    color     String
     location  String?
 }
