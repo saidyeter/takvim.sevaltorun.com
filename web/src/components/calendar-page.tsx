@@ -48,7 +48,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
         );
 
         if (foundEvent) {
-          color = isColor(foundEvent.color) ? foundEvent.color : "white";
+          color = pickColor(foundEvent.id);
         }
         week.push({
           dayNumber,
@@ -82,14 +82,13 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
               Takvim | {months.selectedDate.monthName}{" "}
               {months.selectedDate.year}
             </title>
-            <style>{getCssVariables(monthlyEvents?.events ?? [])}</style>
           </>
         ) : (
           <title>Takvim</title>
         )}
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        <div className="flex w-full flex-col items-center  p-4 md:w-[720px] md:p-0">
+        <div className="flex w-full flex-col items-center p-4 md:w-[720px] md:p-0">
           {!!months && (
             <>
               <div className="flex w-full items-end justify-between">
@@ -125,11 +124,12 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
                       return (
                         <div
                           key={index}
-                          className={`flex w-full flex-col gap-1 border-l-4 bg-white/10 p-2 pl-4 text-white`}
-                          style={{ borderColor: value.color }}
+                          className={`flex w-full flex-col gap-1 border-l-8 bg-white/10 p-2 pl-4 text-white`}
+                          style={{ borderColor: pickColor(value.id) }}
                         >
-                          <p className="text-slate-300 font-light">
-                            {getLocaleDate(value.starts)}-{getLocaleDate(value.ends)}
+                          <p className="font-light text-slate-300">
+                            {getLocaleDate(value.starts)}-
+                            {getLocaleDate(value.ends)}
                           </p>
                           <p className="font-semibold">{value.desc}</p>
                         </div>
@@ -165,10 +165,12 @@ function WeekCell(props: { day: number; color?: string }) {
           <>
             <span>{props.day}</span>
             {props.color && (
-              <div
-                style={{ backgroundColor: props.color }}
-                className="absolute right-3 top-3 h-2 w-2 rounded-full"
-              />
+              <>
+                <div
+                  style={{ backgroundColor: props.color }}
+                  className="absolute bottom-1 left-auto right-auto h-2 w-2 rounded-full"
+                />
+              </>
             )}
           </>
         )}
@@ -178,36 +180,70 @@ function WeekCell(props: { day: number; color?: string }) {
 }
 
 function getLocaleDate(ms: Date) {
-  return ms
-    .toLocaleDateString("tr-TR", {
-      // year: "numeric",
-      month: "long",
-      day: "numeric",
-      // dateStyle:'long'
-    })
-  
+  return ms.toLocaleDateString("tr-TR", {
+    // year: "numeric",
+    month: "long",
+    day: "numeric",
+    // dateStyle:'long'
+  });
 }
 
-function isColor(strColor: string) {
-  const s = new Option().style;
-  s.color = strColor;
-  return s.color !== "";
-}
-
-function getCssVariables(events: Event[]) {
-  const allColors = events.map((e) => {
-    return {
-      cssName: "event-" + e.id,
-      color: isColor(e.color) ? e.color : "white",
-    };
-  });
-  //<style>:root {`{--text-color: #9E6F21;}`}</style>
-  let styleTag = ":root {";
-  allColors.forEach((c) => {
-    styleTag += `--${c.cssName}: ${c.color};`;
-  });
-  styleTag += "}";
-  return styleTag;
-}
+// function isColor(strColor: string) {
+//   const s = new Option().style;
+//   s.color = strColor;
+//   return s.color !== "";
+// }
 
 export default CalendarPage;
+
+function pickColor(id: string) {
+  const hash = Math.abs(hashCode(id));
+  const colorIndex = hash % colors.length;
+  console.log(id, hash, colorIndex, colors[colorIndex]);
+
+  return colors[colorIndex];
+}
+
+function hashCode(value: string) {
+  let hash = 0,
+    i,
+    chr;
+  if (value.length === 0) return hash;
+  for (i = 0; i < value.length; i++) {
+    chr = value.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
+const colors = [
+  "#A6D0DD",
+  "#FF6969",
+  "#FFD3B0",
+  "#E8A0BF",
+  "#BA90C6",
+  "#C7E9B0",
+  "#CCD5AE",
+  "#FFB4B4",
+  "#FFACAC",
+  "#FFAACF",
+  "#FFCEFE",
+  "#F8CBA6",
+  "#CDE990",
+  "#8DCBE6",
+  "#FD8A8A",
+  "#BCEAD5",
+  "#9ED5C5",
+  "#BCCEF8",
+  "#ABD9FF",
+  "#FFABE1",
+  "#B1D7B4",
+  "#F7ECDE",
+  "#B2C8DF",
+  "#C4D7E0",
+  "#C7D36F",
+  "#E0DECA",
+  "#CDC2AE",
+  "#92B4EC",
+];
