@@ -113,7 +113,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
               </div>
               {!!monthlyEvents && (
                 <>
-                  <div className="mt-4 flex w-full flex-col gap-4 rounded-xl bg-white/10 p-4  text-white">
+                  <div className="mt-4 flex w-full flex-col rounded-xl bg-white/10 p-4  text-white">
                     {cal.map((week, index) => {
                       return <WeekRow key={index} week={week} />;
                     })}
