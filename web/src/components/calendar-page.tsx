@@ -42,9 +42,22 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
         });
       } else {
         let color: string | undefined = undefined;
+        const currentDayStarting = new Date(
+          months?.selectedDate.year ?? 0,
+          (months?.selectedDate.month ?? 0) - 1,
+          dayNumber
+        );        
+        const currentDayEnding = new Date(
+          months?.selectedDate.year ?? 0,
+          (months?.selectedDate.month ?? 0) - 1,
+          dayNumber,
+          23,
+          59,
+          59
+        );
+        // currentDay.setHours(10)
         const foundEvent = monthlyEvents.events.find(
-          (e) =>
-            e.starts.getDate() <= dayNumber && e.ends.getDate() >= dayNumber
+          (e) => e.starts <= currentDayEnding && e.ends >= currentDayStarting
         );
 
         if (foundEvent) {
