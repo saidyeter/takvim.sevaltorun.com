@@ -212,7 +212,7 @@ export default CalendarPage;
 function pickColor(id: string) {
   const hash = Math.abs(hashCode(id));
   const colorIndex = hash % colors.length;
-  console.log(id, hash, colorIndex, colors[colorIndex]);
+  //console.log(id, hash, colorIndex, colors[colorIndex]);
 
   return colors[colorIndex];
 }
