@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
-import type { Event } from "@prisma/client";
+
 type CellProps = {
   dayNumber: number;
   color?: string;
@@ -46,7 +46,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
           months?.selectedDate.year ?? 0,
           (months?.selectedDate.month ?? 0) - 1,
           dayNumber
-        );        
+        );
         const currentDayEnding = new Date(
           months?.selectedDate.year ?? 0,
           (months?.selectedDate.month ?? 0) - 1,
@@ -84,7 +84,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
     }
     // console.log(weeks);
     setCal(weeks);
-  }, [monthlyEvents]);
+  }, [monthlyEvents, months]);
 
   return (
     <>

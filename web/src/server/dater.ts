@@ -23,7 +23,7 @@ function getMonths(year: number, monthIndex: number) {
     const selectedDate = {
         month: date.getMonth() + 1,
         year: date.getFullYear(),
-        monthName: monthNames[date.getMonth()]
+        monthName: monthNames[date.getMonth()] ?? ''
     }
 
     date.setMonth(date.getMonth() + 1)
@@ -31,14 +31,14 @@ function getMonths(year: number, monthIndex: number) {
     const nextDate = {
         month: date.getMonth() + 1,
         year: date.getFullYear(),
-        monthName: monthNames[date.getMonth()]
+        monthName: monthNames[date.getMonth()] ?? ''
     }
 
     date.setMonth(date.getMonth() - 2)
     const previousDate = {
         month: date.getMonth() + 1,
         year: date.getFullYear(),
-        monthName: monthNames[date.getMonth()]
+        monthName: monthNames[date.getMonth()] ?? ''
     }
 
 

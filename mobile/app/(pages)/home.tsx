@@ -1,10 +1,37 @@
 import { StyleSheet } from "react-native";
 
-import EditScreenInfo from "../../components/EditScreenInfo";
 import { Text, View } from "../../components/Themed";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import api from "../../api/client";
 
 export default function HomePage() {
+
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["calendarData"],
+    queryFn: () => api.getMonthlyEvents({
+      year:2023,
+      monthIndex:5
+    }),
+  });
+
+  if (isLoading) {
+    console.log('loading');
+  }
+  if (error) {
+    console.log('error',error);
+  }
+  else{
+    if (data) {
+      console.log(JSON.stringify(data));
+        }
+        else{
+          console.log('nodata');
+          
+        }
+    
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Home</Text>
