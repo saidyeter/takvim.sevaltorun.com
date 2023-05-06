@@ -24,7 +24,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Stack>
+    <Stack initialRouteName="home">
       <Stack.Screen
         name="home"
         options={{ headerShown: false }}
