@@ -53,12 +53,16 @@ function RootLayoutNav() {
         >
           <Stack initialRouteName="index">
             <Stack.Screen
-              name="(pages)"
+              name="index"
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name="index"
-              options={{ headerShown: false }}
+              name="new"
+              options={{ headerTitle: 'Yeni' }}
+            />
+            <Stack.Screen
+              name="edit"
+              options={{ headerTitle: 'Düzenle' }}
             />
 
           </Stack>

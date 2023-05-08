@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import EditScreenInfo from "../../components/EditScreenInfo";
-import { Text, View } from "../../components/Themed";
+import { Text, View } from "../components/Themed";
 import { Link } from "expo-router";
 
 export default function EditPage() {
@@ -9,7 +8,7 @@ export default function EditPage() {
     <View style={styles.container}>
       <Text style={styles.title}>edit</Text>
       <Link href={{ pathname: "new" }}>new</Link>
-      <Link href={{ pathname: "home" }}>home</Link>
+      <Link href={{ pathname: "/" }}>home</Link>
     </View>
   );
 }
