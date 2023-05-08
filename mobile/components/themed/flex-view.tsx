@@ -9,8 +9,8 @@ export interface ViewProps extends FlexStyle {
 export function FlexView(props: ViewProps) {
   const defaultStyle: { [key: string]: number | string } = {
     backgroundColor: props.bg ?? "black",
-    padding: props.padding ?? 2,
-    width: props.width ?? "100%",
+    padding: 2,
+    width: "100%",
   };
   if (!props.noFlex) {
     defaultStyle.flex = props.flex ?? 1;
@@ -22,7 +22,7 @@ export function FlexView(props: ViewProps) {
       defaultStyle[p[0]] = p[1];
     }
   });
-  console.log("defaultStyle", defaultStyle);
+  // console.log("defaultStyle", defaultStyle);
 
   return <View style={defaultStyle}>{props.children}</View>;
 }
