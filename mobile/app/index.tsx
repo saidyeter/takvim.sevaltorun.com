@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
 
-import { Text, View } from "../components/Themed";
-import { Link, useRouter } from "expo-router";
+import { View, Text } from "../components/Themed";
+import { Link } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import api from "../api/client";
+import Calendar from "../components/calendar";
 
 export default function IndexPage() {
   const { data: months } = useQuery({
@@ -28,63 +29,40 @@ export default function IndexPage() {
   if (monthlyEvents) {
     console.log(monthlyEvents);
   }
-  // // const { data: months } = api.calendar.getRelatedMonths.useQuery({
-  // //   year: props.year,
-  // //   monthIndex: props.monthIndex,
-  // // });
-  // // const { data: monthlyEvents } = api.calendar.getMonthlyEvents.useQuery(
-  // //   {
-  // //     ...props,
-  // //   },
-  // //   {
-  // //     enabled: !!months,
-  // //   }
-  // // );
-
-  // const { isLoading, error, data } = useQuery({
-  //   queryKey: ["calendarData"],
-  //   queryFn: () =>
-  //     api.getMonthlyEvents({
-  //       year: 2023,
-  //       monthIndex: 5,
-  //     }),
-  // });
-
-  // if (isLoading) {
-  //   console.log("loading");
-  // }
-  // if (error) {
-  //   console.log("error", error);
-  // } else {
-  //   if (data) {
-  //     console.log(data);
-  //   } else {
-  //     console.log("nodata");
-  //   }
-  // }
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-      <Link href={{ pathname: "new" }}>new</Link>
+    <>
+      <View
+        style={{
+          width: "100%",
+          height: "20%",
+        }}
+      />
+      <View
+        style={{
+          width: "100%",
+          height: "60%",
+          backgroundColor: "green",
+        }}
+      >
+        <Calendar />
+      </View>
+      <View
+        style={{
+          width: "100%",
+          height: "20%",
+          flex:1,
+          justifyContent:'center',
+        alignItems:'center'
+        }}
+      >
+        <Link href={{ pathname: "new" }}>new</Link>
+      </View>
+      {/* <View style={styles.container}>
+
       <Link href={{ pathname: "edit" }}>edit</Link>
-    </View>
+   
+
+    </View> */}
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
-  },
-});
