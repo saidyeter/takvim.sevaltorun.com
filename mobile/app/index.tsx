@@ -1,15 +1,19 @@
-import { Text } from "../components/Themed";
 import { Link } from "expo-router";
 import Calendar from "../components/calendar";
 import { FlexView } from "../components/themed/flex-view";
 import { StatusBar } from "expo-status-bar";
+import { Label } from "../components/themed/label";
 
 export default function IndexPage() {
   return (
     <>
       <StatusBar style="light" />
       <FlexView height="20%">
-        <Text style={{ color: "white" }}>selam</Text>
+        <Label size="xs">Selam</Label>
+        <Label size="s">Selam</Label>
+        <Label size="m">Selam</Label>
+        <Label size="l">Selam</Label>
+        <Label size="xl">Selam</Label>
       </FlexView>
       <FlexView
         noFlex
@@ -20,7 +24,8 @@ export default function IndexPage() {
       </FlexView>
       <FlexView height="20%">
         <Link href={{ pathname: "new" }}>
-          <Text style={{ color: "white" }}>new</Text>
+          <Label size="l">new</Label>
+          <Label size="xl">new</Label>
         </Link>
       </FlexView>
     </>
