@@ -1,9 +1,11 @@
 import { FlexStyle, View } from "react-native";
 
 export interface ViewProps extends FlexStyle {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   noFlex?: boolean;
   bg?: string;
+  borderRadius?:number
+  borderColor?:string
 }
 
 export function FlexView(props: ViewProps) {
