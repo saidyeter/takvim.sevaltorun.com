@@ -213,7 +213,7 @@ export default function Calendar() {
                         gap: 1,
                         width: "100%",
                         borderLeftWidth: 12,
-                         borderColor: pickColor(value.id),
+                        borderColor: pickColor(value.id),
                         // backgroundColor: pickColor(value.id),//"grey",
                         padding: 2,
                         paddingLeft: 4,
