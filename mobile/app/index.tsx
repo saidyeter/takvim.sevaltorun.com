@@ -8,13 +8,7 @@ export default function IndexPage() {
   return (
     <>
       <StatusBar style="light" />
-      <FlexView height="20%">
-        <Label size="xs">Selam</Label>
-        <Label size="s">Selam</Label>
-        <Label size="m">Selam</Label>
-        <Label size="l">Selam</Label>
-        <Label size="xl">Selam</Label>
-      </FlexView>
+      <FlexView height="20%"/>
       <FlexView
         noFlex
         padding={0}
@@ -25,7 +19,6 @@ export default function IndexPage() {
       <FlexView height="20%">
         <Link href={{ pathname: "new" }}>
           <Label size="l">new</Label>
-          <Label size="xl">new</Label>
         </Link>
       </FlexView>
     </>

@@ -3,6 +3,8 @@ import { Text, View } from "./Themed";
 import api from "../api/client";
 import { useQuery } from "@tanstack/react-query";
 import { Pressable } from "react-native";
+import { FlexView } from "./themed/flex-view";
+import { Label } from "./themed/label";
 
 type CellProps = {
   dayNumber: number;
@@ -92,30 +94,14 @@ export default function Calendar() {
   }, [monthlyEvents, months]);
 
   return (
-    <View
-      style={{
-        width: "100%",
-        height: "100%",
-      }}
+    <FlexView
+      noFlex
+      height="100%"
     >
       {!!months && (
         <>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              width: "100%",
-              backgroundColor: "blue",
-            }}
-          >
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+          <FlexView flexDirection="row">
+            <FlexView flexDirection="column">
               <Pressable
                 onPress={() => {
                   console.log("pressed 1");
@@ -123,37 +109,21 @@ export default function Calendar() {
               >
                 {({ pressed }) => (
                   <>
-                    <Text style={{ color: pressed ? "white" : "grey" }}>
+                    <Label color={pressed ? "white" : "grey"}>
                       {months.previousDate.monthName}
-                    </Text>
-                    <Text style={{ color: pressed ? "white" : "grey" }}>
+                    </Label>
+                    <Label color={pressed ? "white" : "grey"}>
                       {months.previousDate.year}
-                    </Text>
+                    </Label>
                   </>
                 )}
               </Pressable>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text style={{ color: "black" }}>
-                {months.selectedDate.monthName}
-              </Text>
-              <Text style={{ color: "black" }}>{months.selectedDate.year}</Text>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+            </FlexView>
+            <FlexView flexDirection="column">
+              <Label>{months.selectedDate.monthName}</Label>
+              <Label>{months.selectedDate.year}</Label>
+            </FlexView>
+            <FlexView flexDirection="column">
               <Pressable
                 onPress={() => {
                   console.log("pressed 2");
@@ -161,27 +131,23 @@ export default function Calendar() {
               >
                 {({ pressed }) => (
                   <>
-                    <Text style={{ color: pressed ? "white" : "grey" }}>
+                    <Label color={pressed ? "white" : "grey"}>
                       {months.nextDate.monthName}
-                    </Text>
-                    <Text style={{ color: pressed ? "white" : "grey" }}>
+                    </Label>
+                    <Label color={pressed ? "white" : "grey"}>
                       {months.nextDate.year}
-                    </Text>
+                    </Label>
                   </>
                 )}
               </Pressable>
-            </View>
-          </View>
+            </FlexView>
+          </FlexView>
           {!!monthlyEvents && (
             <>
-              <View
-                style={{
-                  flex: 2,
-                  flexDirection: "column",
-                  borderRadius: 20,
-                  marginTop: 4,
-                  width: "100%",
-                }}
+              <FlexView
+                flex={2}
+                flexDirection="column"
+                marginTop={4}
               >
                 {cal.map((week, index) => {
                   return (
@@ -191,72 +157,53 @@ export default function Calendar() {
                     />
                   );
                 })}
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: "column",
-                  borderRadius: 20,
-                  marginTop: 2,
-                  gap: 1,
-                }}
+              </FlexView>
+              <FlexView
+                flexDirection="column"
+                marginTop={2}
+                gap={1}
               >
                 {monthlyEvents.events.map((value, index) => {
                   return (
-                    <View
+                    <FlexView
                       key={index}
-                      style={{
-                        flex: 1,
-                        flexDirection: "column",
-                        // borderRadius: 20,
-                        marginTop: 2,
-                        gap: 1,
-                        width: "100%",
-                        borderLeftWidth: 12,
-                        borderColor: pickColor(value.id),
-                        // backgroundColor: pickColor(value.id),//"grey",
-                        padding: 2,
-                        paddingLeft: 4,
-                      }}
+                      flexDirection="column"
+                      marginTop={2}
+                      gap={1}
+                      paddingLeft={4}
+                      borderColor={pickColor(value.id)}
+                      borderLeftWidth={6}
                     >
-                      <Text
-                        style={{
-                          // color: "white",
-                          fontWeight: "200",
-                        }}
+                      <Label
+                        fontWeight="200"
+                        textAlign="left"
                       >
                         {getLocaleDate(value.starts)}-
                         {getLocaleDate(value.ends)}
-                      </Text>
-                      <Text
-                        style={{
-                          // color: "white",
-                          fontWeight: "600",
-                        }}
+                      </Label>
+                      <Label
+                        fontWeight="600"
+                        textAlign="left"
                       >
                         {value.desc}
-                      </Text>
-                    </View>
+                      </Label>
+                    </FlexView>
                   );
                 })}
-              </View>
+              </FlexView>
             </>
           )}
         </>
       )}
-    </View>
+    </FlexView>
   );
 }
 
 function WeekRow(props: { week: CellProps[] }) {
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: "row",
-        width: "100%",
-        justifyContent: "space-around",
-      }}
+    <FlexView
+      flexDirection="row"
+      justifyContent="space-around"
     >
       {props.week.map((day, index) => (
         <WeekCell
@@ -265,41 +212,30 @@ function WeekRow(props: { week: CellProps[] }) {
           color={day.color}
         />
       ))}
-    </View>
+    </FlexView>
   );
 }
 function WeekCell(props: { day: number; color?: string }) {
+  // console.log(props.color);
+
   return (
-    <>
-      <View
-        style={{
-          flex: 1,
-          width: "100%",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          // backgroundColor: "black",
-        }}
-      >
-        {props.day === -1 ? (
-          <></>
-        ) : (
-          <>
-            <Text style={{ color: "black" }}>{props.day}</Text>
-            {props.color && (
-              <View
-                style={{
-                  backgroundColor: "red",
-                  borderRadius: 15,
-                  width: 4,
-                  height: 4,
-                }}
-              />
-            )}
-          </>
-        )}
-      </View>
-    </>
+    <FlexView flexDirection="column">
+      {props.day === -1 ? (
+        <></>
+      ) : (
+        <>
+          <Label>{props.day}</Label>
+          {props.color && (
+            <FlexView
+              bg="red"
+              borderRadius={15}
+              width={4}
+              height={4}
+            />
+          )}
+        </>
+      )}
+    </FlexView>
   );
 }
 

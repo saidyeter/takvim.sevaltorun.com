@@ -1,7 +1,7 @@
 import { ColorValue, Text, TextStyle } from "react-native";
 type Size = "xs" | "s" | "m" | "l" | "xl";
 export interface LabelProps extends TextStyle {
-  children: string;
+  children: string| number|string[];
   size?: Size;
 }
 
