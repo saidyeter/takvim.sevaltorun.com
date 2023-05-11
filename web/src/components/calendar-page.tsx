@@ -168,6 +168,7 @@ function WeekRow(props: { week: CellProps[] }) {
     </div>
   );
 }
+
 function WeekCell(props: { day: number; color?: string }) {
   return (
     <>
@@ -213,7 +214,6 @@ function pickColor(id: string) {
   const hash = Math.abs(hashCode(id));
   const colorIndex = hash % colors.length;
   //console.log(id, hash, colorIndex, colors[colorIndex]);
-
   return colors[colorIndex];
 }
 
