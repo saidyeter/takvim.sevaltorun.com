@@ -41,9 +41,8 @@ export default function Calendar() {
         monthIndex: selectedDate.monthIndex,
       }),
   });
+  
   useEffect(() => {
-    console.log("refetcg");
-
     refetchEvents();
     refetchMonths();
   }, [selectedDate]);
