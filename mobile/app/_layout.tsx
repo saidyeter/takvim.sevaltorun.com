@@ -58,11 +58,20 @@ function RootLayoutNav() {
             />
             <Stack.Screen
               name="new"
-              options={{ headerTitle: 'Yeni' }}
+              options={{
+                headerTitle: "Yeni",
+                headerStyle: {
+                  backgroundColor: "black",
+                },
+                headerTintColor: "white",
+                headerTitleStyle: {
+                  fontWeight: "bold",
+                },
+              }}
             />
             <Stack.Screen
               name="edit"
-              options={{ headerTitle: 'Düzenle' }}
+              options={{ headerTitle: "Düzenle" }}
             />
 
           </Stack>
