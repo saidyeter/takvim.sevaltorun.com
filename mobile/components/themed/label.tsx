@@ -30,18 +30,19 @@ export function Label(props: LabelProps) {
 }
 
 function getFontSize(size?: Size) {
+  const base=12
     switch (size) {
       case "xs":
-        return 12;
+        return base;
       case "s":
-        return 16;
+        return base + 4;
       case "m":
-        return 20;
+        return base + 8;
       case "l":
-        return 24;
+        return base + 12;
       case "xl":
-        return 32;
+        return base + 16;
       default:
-        return 16;
+        return base + 8;
     }
   }

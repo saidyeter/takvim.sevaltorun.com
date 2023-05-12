@@ -10,7 +10,7 @@ export interface ViewProps extends FlexStyle {
 
 export function FlexView(props: ViewProps) {
   const defaultStyle: { [key: string]: number | string } = {
-    backgroundColor: props.bg ?? "black",
+    backgroundColor: props.bg ?? "black",//15162c
     padding: 2,
     width: "100%",
   };
