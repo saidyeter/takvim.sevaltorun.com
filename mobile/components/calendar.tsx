@@ -11,25 +11,42 @@ type CellProps = {
   color?: string;
 };
 export default function Calendar() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState({
+    year: new Date().getFullYear(),
+    monthIndex: new Date().getMonth(),
+  });
   const [cal, setCal] = useState([] as CellProps[][]);
 
-  const { data: months } = useQuery({
+  const {
+    data: months,
+    refetch: refetchMonths,
+    isLoading: monthsLoading,
+  } = useQuery({
     queryKey: ["months"],
     queryFn: () =>
       api.getRelatedMonths({
-        year: selectedDate.getFullYear(),
-        monthIndex: selectedDate.getMonth(),
+        year: selectedDate.year,
+        monthIndex: selectedDate.monthIndex,
       }),
   });
-  const { data: monthlyEvents } = useQuery(["events"], {
-    enabled: !!months,
+  const {
+    data: monthlyEvents,
+    refetch: refetchEvents,
+    isLoading: eventsLoading,
+  } = useQuery({
+    queryKey: ["events"],
     queryFn: () =>
       api.getMonthlyEvents({
-        year: months?.selectedDate.year ?? 0,
-        monthIndex: months?.selectedDate.month ?? 0,
+        year: selectedDate.year,
+        monthIndex: selectedDate.monthIndex,
       }),
   });
+  useEffect(() => {
+    console.log("refetcg");
+
+    refetchEvents();
+    refetchMonths();
+  }, [selectedDate]);
 
   useEffect(() => {
     if (!monthlyEvents) {
@@ -66,9 +83,11 @@ export default function Calendar() {
         const foundEvent = monthlyEvents.events.find(
           (e) => e.starts <= currentDayEnding && e.ends >= currentDayStarting
         );
-
+        // console.log(monthlyEvents);
         if (foundEvent) {
           color = pickColor(foundEvent.id);
+        } else {
+          // console.log(currentDayEnding);
         }
         week.push({
           dayNumber,
@@ -100,11 +119,21 @@ export default function Calendar() {
     >
       {!!months && (
         <>
-          <FlexView flexDirection="row">
+          <FlexView
+            flexDirection="row"
+            alignItems="flex-end"
+          >
             <FlexView flexDirection="column">
               <Pressable
                 onPress={() => {
-                  console.log("pressed 1");
+                  setSelectedDate((p) => {
+                    const d = new Date(p.year, p.monthIndex, 1);
+                    d.setMonth(d.getMonth() - 1);
+                    return {
+                      year: d.getFullYear(),
+                      monthIndex: d.getMonth(),
+                    };
+                  });
                 }}
               >
                 {({ pressed }) => (
@@ -120,13 +149,20 @@ export default function Calendar() {
               </Pressable>
             </FlexView>
             <FlexView flexDirection="column">
-              <Label>{months.selectedDate.monthName}</Label>
-              <Label>{months.selectedDate.year}</Label>
+              <Label size="l">{months.selectedDate.monthName}</Label>
+              <Label size="l">{months.selectedDate.year}</Label>
             </FlexView>
             <FlexView flexDirection="column">
               <Pressable
                 onPress={() => {
-                  console.log("pressed 2");
+                  setSelectedDate((p) => {
+                    const d = new Date(p.year, p.monthIndex, 1);
+                    d.setMonth(d.getMonth() + 1);
+                    return {
+                      year: d.getFullYear(),
+                      monthIndex: d.getMonth(),
+                    };
+                  });
                 }}
               >
                 {({ pressed }) => (
@@ -142,10 +178,10 @@ export default function Calendar() {
               </Pressable>
             </FlexView>
           </FlexView>
-          {!!monthlyEvents && (
-            <>
+          {!!monthlyEvents && !eventsLoading && (
+            <FlexView flex={4}>
               <FlexView
-                flex={2}
+                height="70%"
                 flexDirection="column"
                 marginTop={4}
               >
@@ -159,7 +195,8 @@ export default function Calendar() {
                 })}
               </FlexView>
               <FlexView
-                flexDirection="column"
+                noFlex
+                height="30%"
                 marginTop={2}
                 gap={1}
               >
@@ -191,7 +228,7 @@ export default function Calendar() {
                   );
                 })}
               </FlexView>
-            </>
+            </FlexView>
           )}
         </>
       )}
@@ -219,7 +256,11 @@ function WeekCell(props: { day: number; color?: string }) {
   // console.log(props.color);
 
   return (
-    <FlexView flexDirection="column">
+    <FlexView
+      flexDirection="column"
+      width={32}
+      height={32}
+    >
       {props.day === -1 ? (
         <></>
       ) : (
@@ -227,10 +268,10 @@ function WeekCell(props: { day: number; color?: string }) {
           <Label>{props.day}</Label>
           {props.color && (
             <FlexView
-              bg="red"
-              borderRadius={15}
-              width={4}
-              height={4}
+              bg={props.color}
+              borderRadius={50}
+              width={2}
+              height={2}
             />
           )}
         </>
