@@ -1,4 +1,5 @@
 import { z } from "zod";
+import constants from "../constants";
 
 export default {
     getMonthlyEvents,
@@ -8,8 +9,8 @@ export default {
 
 
 // const baseUrl = 'https://takvim.sevaltorun.com/api'
-const baseUrl = 'http://localhost:3000/api'
-
+const baseUrl = constants.API_URL
+const apiKey = constants.API_KEY
 
 const allowedDate = z.object({
     year: z.number().min(2019).max(2030),
@@ -123,7 +124,7 @@ async function createEvent(params: z.infer<typeof newEventSchema>): Promise<z.in
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            Authorization: 'apikey'
+            Authorization: apiKey
         },
     })
 
