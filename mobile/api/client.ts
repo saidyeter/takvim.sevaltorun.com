@@ -2,7 +2,8 @@ import { z } from "zod";
 
 export default {
     getMonthlyEvents,
-    getRelatedMonths
+    getRelatedMonths,
+    createEvent,
 }
 
 
@@ -15,6 +16,22 @@ const allowedDate = z.object({
     monthIndex: z.number().min(0).max(12)
 })
 
+const eventApiResponseSchema = z.object({
+    id: z.string(),
+    createdAt: z.string().datetime(),
+    desc: z.string(),
+    starts: z.string().datetime(),
+    ends: z.string().datetime(),
+    location: z.string().optional().nullable(),
+})
+const eventSchema = z.object({
+    id: z.string(),
+    createdAt: z.date(),
+    desc: z.string(),
+    starts: z.date(),
+    ends: z.date(),
+    location: z.string().optional().nullable(),
+})
 const getMonthlyEventsApiResponseSchema = z.object({
     startWeekDay: z.number().min(0).max(31),
     monthLength: z.number().min(28).max(31),
@@ -24,7 +41,7 @@ const getMonthlyEventsApiResponseSchema = z.object({
         desc: z.string(),
         starts: z.string().datetime(),
         ends: z.string().datetime(),
-        location: z.string(),
+        location: z.string().optional().nullable(),
     }).array()
 })
 const getMonthlyEventsResultSchema = z.object({
@@ -36,7 +53,7 @@ const getMonthlyEventsResultSchema = z.object({
         desc: z.string(),
         starts: z.date(),
         ends: z.date(),
-        location: z.string(),
+        location: z.string().optional().nullable()
     }).array()
 })
 
@@ -66,15 +83,15 @@ async function getMonthlyEvents(params: z.infer<typeof allowedDate>): Promise<z.
     console.log('calendar validation error', validation.error);
     return undefined
 }
-const monthDetailSchema=z.object({
-    month:z.number().min(0).max(12),
+const monthDetailSchema = z.object({
+    month: z.number().min(0).max(12),
     year: z.number().min(2019).max(2030),
     monthName: z.string()
 })
-const getRelatedMonthsResultSchema=z.object({
-    selectedDate:monthDetailSchema,
-    previousDate:monthDetailSchema,
-    nextDate:monthDetailSchema
+const getRelatedMonthsResultSchema = z.object({
+    selectedDate: monthDetailSchema,
+    previousDate: monthDetailSchema,
+    nextDate: monthDetailSchema
 })
 
 async function getRelatedMonths(params: z.infer<typeof allowedDate>): Promise<z.infer<typeof getRelatedMonthsResultSchema> | undefined> {
@@ -87,5 +104,38 @@ async function getRelatedMonths(params: z.infer<typeof allowedDate>): Promise<z.
         return validation.data
     }
     console.log('calendar validation error', validation.error);
+    return undefined
+}
+
+const newEventSchema = z.object({
+    desc: z.string(),
+    starts: z.date(),
+    ends: z.date(),
+    location: z.string().optional(),
+})
+
+async function createEvent(params: z.infer<typeof newEventSchema>): Promise<z.infer<typeof eventApiResponseSchema> | undefined> {
+
+    const url = baseUrl + '/calendar/event'
+    const res = await fetch(url, {
+        method: 'post',
+        body: JSON.stringify(params),
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: 'apikey'
+        },
+    })
+
+    if (res.status == 201) {
+        const resJson = await res.json()
+        console.log(res.status, resJson);
+        const validation = eventApiResponseSchema.safeParse(resJson)
+        if (validation.success) {
+            return validation.data
+        }
+        console.log('calendar validation error', validation.error);
+    }
+    console.log('something wrong validation error', res.status);
     return undefined
 }

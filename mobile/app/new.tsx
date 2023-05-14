@@ -6,6 +6,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
 import { TextBox } from "../components/themed/text-box";
 import { Touchable } from "../components/themed/touchable";
+import api from "../api/client";
 
 export default function NewPage() {
   const { back } = useRouter();
@@ -25,7 +26,7 @@ export default function NewPage() {
     setEndDate(currentDate ?? new Date());
   };
 
-  function onSave() {
+  async function onSave() {
     setError("");
     if (startDate > endDate) {
       setError("Başlangıç tarihi bitiş tarihinden sonra olamaz");
@@ -33,11 +34,14 @@ export default function NewPage() {
     }
     const newEvent = {
       desc,
-      startDate,
-      endDate,
+      starts: startDate,
+      ends: endDate,
     };
-    console.log(newEvent);
-    back();
+    const res = await api.createEvent(newEvent);
+    if (res && res.id) {
+      back();
+    }
+    setError("biseyler ters gitti");
   }
 
   return (

@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Text, View } from "./Themed";
 import api from "../api/client";
 import { useQuery } from "@tanstack/react-query";
-import { Pressable } from "react-native";
+import { Pressable, ScrollView } from "react-native";
 import { FlexView } from "./themed/flex-view";
 import { Label } from "./themed/label";
 
@@ -41,11 +40,16 @@ export default function Calendar() {
         monthIndex: selectedDate.monthIndex,
       }),
   });
-  
+
   useEffect(() => {
     refetchEvents();
     refetchMonths();
   }, [selectedDate]);
+
+  if (!eventsLoading && !monthlyEvents) {
+    console.log("data yoK");
+    // refetchEvents()
+  }
 
   useEffect(() => {
     if (!monthlyEvents) {
@@ -178,9 +182,9 @@ export default function Calendar() {
             </FlexView>
           </FlexView>
           {!!monthlyEvents && !eventsLoading && (
-            <FlexView flex={4}>
+            <FlexView flex={5}>
               <FlexView
-                height="70%"
+                height="60%"
                 flexDirection="column"
                 marginTop={4}
               >
@@ -195,37 +199,39 @@ export default function Calendar() {
               </FlexView>
               <FlexView
                 noFlex
-                height="30%"
+                height="40%"
                 marginTop={2}
                 gap={1}
               >
-                {monthlyEvents.events.map((value, index) => {
-                  return (
-                    <FlexView
-                      key={index}
-                      flexDirection="column"
-                      marginTop={2}
-                      gap={1}
-                      paddingLeft={4}
-                      borderColor={pickColor(value.id)}
-                      borderLeftWidth={6}
-                    >
-                      <Label
-                        fontWeight="200"
-                        textAlign="left"
+                <ScrollView>
+                  {monthlyEvents.events.map((value, index) => {
+                    return (
+                      <FlexView
+                        key={index}
+                        flexDirection="column"
+                        marginTop={2}
+                        gap={1}
+                        paddingLeft={4}
+                        borderColor={pickColor(value.id)}
+                        borderLeftWidth={6}
                       >
-                        {getLocaleDate(value.starts)}-
-                        {getLocaleDate(value.ends)}
-                      </Label>
-                      <Label
-                        fontWeight="600"
-                        textAlign="left"
-                      >
-                        {value.desc}
-                      </Label>
-                    </FlexView>
-                  );
-                })}
+                        <Label
+                          fontWeight="200"
+                          textAlign="left"
+                        >
+                          {getLocaleDate(value.starts)}-
+                          {getLocaleDate(value.ends)}
+                        </Label>
+                        <Label
+                          fontWeight="600"
+                          textAlign="left"
+                        >
+                          {value.desc}
+                        </Label>
+                      </FlexView>
+                    );
+                  })}
+                </ScrollView>
               </FlexView>
             </FlexView>
           )}
