@@ -30,6 +30,9 @@ export const calendarRouter = createTRPCRouter({
             }
           ]
         },
+        orderBy:{
+          starts:'asc'
+        }
 
       })
       return {
