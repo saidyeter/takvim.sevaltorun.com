@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "takvim.sevaltorun.com",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -22,11 +22,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "takvim.sevaltorun.mobile"
     },
     "web": {
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "43dcb5e6-78dd-49c2-83cf-af70dc68c1b3"
+      }
     }
   }
 }
