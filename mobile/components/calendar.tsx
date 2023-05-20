@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Pressable, ScrollView } from "react-native";
 import { FlexView } from "./themed/flex-view";
 import { Label } from "./themed/label";
+import { Link } from "expo-router";
+import { Icon } from "./Icon";
 
 type CellProps = {
   dayNumber: number;
@@ -184,7 +186,7 @@ export default function Calendar() {
           {!!monthlyEvents && !eventsLoading && (
             <FlexView flex={5}>
               <FlexView
-                height="60%"
+                height="55%"
                 flexDirection="column"
                 marginTop={4}
               >
@@ -197,6 +199,14 @@ export default function Calendar() {
                   );
                 })}
               </FlexView>
+              <Link href={{ pathname: "new" }} style={{
+                width:'100%',
+                textAlign:'center',
+                backgroundColor:'#15162c',
+                padding:5
+              }}>
+                <Icon name='plus-square-o' color="white" iconsize="xl"/>
+              </Link>
               <FlexView
                 noFlex
                 height="40%"
