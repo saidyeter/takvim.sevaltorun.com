@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Pressable, ScrollView } from "react-native";
 import { FlexView } from "./themed/flex-view";
 import { Label } from "./themed/label";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { Icon } from "./Icon";
 
 type CellProps = {
@@ -12,6 +12,7 @@ type CellProps = {
   color?: string;
 };
 export default function Calendar() {
+  const { push } = useRouter();
   const [selectedDate, setSelectedDate] = useState({
     year: new Date().getFullYear(),
     monthIndex: new Date().getMonth(),
@@ -228,27 +229,41 @@ export default function Calendar() {
                     return (
                       <FlexView
                         key={index}
-                        flexDirection="column"
+                        flexDirection="row"
                         marginTop={12}
                         gap={1}
                         paddingLeft={4}
                         borderColor={pickColor(value.id)}
                         borderLeftWidth={6}
+                        borderBottomWidth={1}
                       >
-                        <Label
-                          fontWeight="600"
-                          textAlign="left"
+                        <FlexView
+                          flexDirection="column"
+                          width="60%"
                         >
-                          {value.desc}
-                        </Label>
-                        <Label
-                          fontWeight="200"
-                          size="xs"
-                          textAlign="left"
+                          <Label
+                            fontWeight="600"
+                            textAlign="left"
+                          >
+                            {value.desc}
+                          </Label>
+                          <Label
+                            fontWeight="200"
+                            size="xs"
+                            textAlign="left"
+                          >
+                            {getLocaleDate(value.starts)}-
+                            {getLocaleDate(value.ends)}
+                          </Label>
+                        </FlexView>
+                        <Link
+                          href={{
+                            pathname: "/edit",
+                            params: { id: value.id },
+                          }}
                         >
-                          {getLocaleDate(value.starts)}-
-                          {getLocaleDate(value.ends)}
-                        </Label>
+                          <Icon name="pencil" color="white" />
+                        </Link>
                       </FlexView>
                     );
                   })}

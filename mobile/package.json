@@ -2,11 +2,9 @@
   "name": "mobile",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "test": "jest --watchAll"
+    "dev": "expo start",
+    "test": "jest --watchAll",
+    "build-apk": "eas build -p android --profile preview"
   },
   "jest": {
     "preset": "jest-expo"

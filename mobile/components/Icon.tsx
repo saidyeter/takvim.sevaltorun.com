@@ -1,15 +1,12 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useColorScheme } from "react-native";
-import Colors from "../constants/Colors";
 
 export function Icon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color?: string;
-  iconsize?: "xs" | "sm" | "md" | "lg" | "xl";
+  iconsize?:"xs" | "s" | "m" | "l" | "xl";
 }) {
-  const colorScheme = useColorScheme();
   if (!props.color) {
-    props.color = Colors[colorScheme ?? "light"].text;
+    props.color = "white"
   }
 
   let calculated_size = 20;
@@ -17,10 +14,10 @@ export function Icon(props: {
     case "xs":
       calculated_size = 12;
       break;
-    case "sm":
+    case "s":
       calculated_size = 16;
       break;
-    case "lg":
+    case "l":
       calculated_size = 24;
       break;
 
