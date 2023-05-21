@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import dater from "~/server/dater";
 import { prisma } from "~/server/db";
 
 import { env } from "~/env.mjs";
@@ -17,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } else if (req.method === 'DELETE') {
     return await Remove(req, res)
   }
-  return res.status(400).json({ err: 'Unexpected method: ' + req.method })
+  return res.status(400).json({ err: `Unexpected method: ${req.method ?? ''}` })
 }
 
 async function Get(req: NextApiRequest, res: NextApiResponse) {
