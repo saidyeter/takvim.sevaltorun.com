@@ -29,6 +29,9 @@ export default function Calendar() {
         year: selectedDate.year,
         monthIndex: selectedDate.monthIndex,
       }),
+    onError: (err: any) => {
+      console.log("err", err);
+    },
   });
   const {
     data: monthlyEvents,
@@ -199,13 +202,20 @@ export default function Calendar() {
                   );
                 })}
               </FlexView>
-              <Link href={{ pathname: "new" }} style={{
-                width:'100%',
-                textAlign:'center',
-                backgroundColor:'#15162c',
-                padding:5
-              }}>
-                <Icon name='plus-square-o' color="white" iconsize="xl"/>
+              <Link
+                href={{ pathname: "new" }}
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                  backgroundColor: "#15162c",
+                  padding: 5,
+                }}
+              >
+                <Icon
+                  name="plus-square-o"
+                  color="white"
+                  iconsize="xl"
+                />
               </Link>
               <FlexView
                 noFlex
@@ -219,24 +229,25 @@ export default function Calendar() {
                       <FlexView
                         key={index}
                         flexDirection="column"
-                        marginTop={2}
+                        marginTop={12}
                         gap={1}
                         paddingLeft={4}
                         borderColor={pickColor(value.id)}
                         borderLeftWidth={6}
                       >
                         <Label
-                          fontWeight="200"
-                          textAlign="left"
-                        >
-                          {getLocaleDate(value.starts)}-
-                          {getLocaleDate(value.ends)}
-                        </Label>
-                        <Label
                           fontWeight="600"
                           textAlign="left"
                         >
                           {value.desc}
+                        </Label>
+                        <Label
+                          fontWeight="200"
+                          size="xs"
+                          textAlign="left"
+                        >
+                          {getLocaleDate(value.starts)}-
+                          {getLocaleDate(value.ends)}
                         </Label>
                       </FlexView>
                     );

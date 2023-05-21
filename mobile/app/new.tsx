@@ -7,6 +7,7 @@ import { useState } from "react";
 import { TextBox } from "../components/themed/text-box";
 import { Touchable } from "../components/themed/touchable";
 import api from "../api/client";
+import { Platform } from "react-native";
 
 export default function NewPage() {
   const { back } = useRouter();
@@ -14,16 +15,20 @@ export default function NewPage() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [error, setError] = useState("");
+  const [showEndDate, setShowEndDate] = useState(false);
+  const [showStartDate, setShowStartDate] = useState(false);
 
   // _e is import { DateTimePickerEvent, } from "@react-native-community/datetimepicker";
   // more : https://github.com/react-native-datetimepicker/datetimepicker#usage
   const onChangeStartDate = (_e: any, date?: Date) => {
     const currentDate = date;
     setStartDate(currentDate ?? new Date());
+    setShowStartDate(false);
   };
   const onChangeEndDate = (_e: any, date?: Date) => {
     const currentDate = date;
     setEndDate(currentDate ?? new Date());
+    setShowEndDate(false);
   };
 
   async function onSave() {
@@ -45,47 +50,105 @@ export default function NewPage() {
   }
 
   return (
-    <FlexView paddingHorizontal="10%">
+    <FlexView
+      paddingVertical="25%"
+      paddingHorizontal="5%"
+    >
       <StatusBar style="light" />
-      <FlexView height="20%" />
-      <FlexView height="60%">
-        <FlexView>
-          <Label>Aciklama</Label>
-          <TextBox onChangeText={setDesc}>{desc}</TextBox>
-        </FlexView>
-        <FlexView
-          flexDirection="row"
-          justifyContent="flex-start"
+      <FlexView>
+        <Label textAlign="left">Aciklama</Label>
+        <TextBox onChangeText={setDesc}>{desc}</TextBox>
+      </FlexView>
+      <FlexView
+        flexDirection="row"
+        justifyContent="flex-start"
+      >
+        <Label
+          width="50%"
+          textAlign="left"
         >
-          <Label width="50%">Başlangıç</Label>
+          Başlangıç
+        </Label>
+
+        {Platform.OS == "ios" && (
           <DateTimePicker
             value={startDate}
             mode="date"
             onChange={onChangeStartDate}
             style={{
-              backgroundColor: "white",
+              backgroundColor: "#ACBCFF",
             }}
           />
-        </FlexView>
-        <FlexView
-          flexDirection="row"
-          justifyContent="flex-start"
+        )}
+        {Platform.OS == "android" && showStartDate && (
+          <DateTimePicker
+            value={startDate}
+            mode="date"
+            onChange={onChangeStartDate}
+          />
+        )}
+        {Platform.OS == "android" && !showStartDate && (
+          <Touchable
+            width="50%"
+            onPress={() => {
+              setShowStartDate(true);
+            }}
+          >
+            {getLocaleDate(startDate)}
+          </Touchable>
+        )}
+      </FlexView>
+      <FlexView
+        flexDirection="row"
+        justifyContent="flex-start"
+      >
+        <Label
+          width="50%"
+          textAlign="left"
         >
-          <Label width="50%">Bitiş</Label>
+          Bitiş
+        </Label>
+
+        {Platform.OS == "ios" && (
           <DateTimePicker
             value={endDate}
             mode="date"
             onChange={onChangeEndDate}
             style={{
-              backgroundColor: "white",
+              backgroundColor: "#ACBCFF",
             }}
           />
-        </FlexView>
+        )}
+        {Platform.OS == "android" && showEndDate && (
+          <DateTimePicker
+            value={endDate}
+            mode="date"
+            onChange={onChangeEndDate}
+          />
+        )}
+        {Platform.OS == "android" && !showEndDate && (
+          <Touchable
+            width="50%"
+            onPress={() => {
+              setShowEndDate(true);
+            }}
+          >
+            {getLocaleDate(endDate)}
+          </Touchable>
+        )}
       </FlexView>
-      <FlexView height="20%">
+      <FlexView>
         <Touchable onPress={onSave}>Oluştur</Touchable>
         <Label>{error}</Label>
       </FlexView>
     </FlexView>
   );
+}
+function getLocaleDate(ms: Date) {
+  return ms.toLocaleDateString("tr-TR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    // dateStyle:'long'
+  });
 }
