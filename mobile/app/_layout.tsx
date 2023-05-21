@@ -1,13 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
-import { useColorScheme } from "react-native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -42,16 +36,23 @@ export default function RootLayout() {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
   const queryClient = new QueryClient();
 
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack initialRouteName="index">
+          <Stack
+            initialRouteName="index"
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: "black",
+              },
+              headerTintColor: "white",
+              headerTitleStyle: {
+                fontWeight: "bold",
+              },
+            }}
+          >
             <Stack.Screen
               name="index"
               options={{ headerShown: false }}
@@ -60,22 +61,15 @@ function RootLayoutNav() {
               name="new"
               options={{
                 headerTitle: "Yeni",
-                headerStyle: {
-                  backgroundColor: "black",
-                },
-                headerTintColor: "white",
-                headerTitleStyle: {
-                  fontWeight: "bold",
-                },
               }}
             />
             <Stack.Screen
               name="edit"
-              options={{ headerTitle: "Düzenle" }}
+              options={{
+                headerTitle: "Düzenle",
+              }}
             />
-
           </Stack>
-        </ThemeProvider>
       </QueryClientProvider>
     </>
   );

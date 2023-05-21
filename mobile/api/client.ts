@@ -5,6 +5,9 @@ export default {
     getMonthlyEvents,
     getRelatedMonths,
     createEvent,
+    getEvent,
+    updateEvent,
+    deleteEvent
 }
 
 
@@ -138,5 +141,71 @@ async function createEvent(params: z.infer<typeof newEventSchema>): Promise<z.in
         console.log('calendar validation error', validation.error);
     }
     console.log('something wrong validation error', res.status);
+    return undefined
+}
+
+
+
+async function getEvent(id: string): Promise<z.infer<typeof eventSchema> | undefined> {
+    const url = baseUrl + '/calendar/event?id=' + id
+    const res = await fetch(url)
+    const resJson = await res.json()
+    const validation = eventApiResponseSchema.safeParse(resJson)
+    if (validation.success) {
+        const result = {
+            id: validation.data.id,
+            createdAt: new Date(validation.data.createdAt),
+            desc: validation.data.desc,
+            starts: new Date(validation.data.starts),
+            ends: new Date(validation.data.ends),
+            location: validation.data.location
+        }
+        return eventSchema.parse(result)
+    }
+
+    console.log('getEvent validation error', validation.error);
+    return undefined
+}
+
+const updateEventRequestSchema = newEventSchema.extend({
+    id: z.string()
+})
+
+async function updateEvent(params: z.infer<typeof updateEventRequestSchema>): Promise<boolean | undefined> {
+
+    const url = baseUrl + '/calendar/event?id=' + params.id
+    const res = await fetch(url, {
+        method: 'put',
+        body: JSON.stringify(params),
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: apiKey
+        },
+    })
+
+    if (res.status == 200) {
+        return true
+    }
+    console.log('unexpected status', res.status);
+
+    return undefined
+}
+
+
+async function deleteEvent(id: string): Promise<boolean | undefined> {
+    const url = baseUrl + '/calendar/event?id=' + id
+    const res = await fetch(url, {
+        method: 'delete',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: apiKey
+        },
+    })
+    if (res.status == 200) {
+        return true
+    }
+    console.log('unexpected status', res.status);
     return undefined
 }
