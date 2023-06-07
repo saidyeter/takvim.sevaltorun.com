@@ -6,7 +6,8 @@ export default methods
 
 function getMonthBoundaries(year: number, month: number) {
     const date = new Date(year, month, 1)
-    const startWeekDay = date.getDay()
+    const weekDay = date.getDay()
+    const startWeekDay = weekDay == 0 ? 7 : weekDay
     date.setMonth(date.getMonth() + 1)
     date.setDate(date.getDate() - 1)
     const monthLength = date.getDate()
