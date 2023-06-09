@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 import { api } from "~/utils/api";
-import { Event } from "@prisma/client";
+import type { Event } from "@prisma/client";
 import { pickColor } from "~/server/color";
 import dater from "~/server/dater";
 

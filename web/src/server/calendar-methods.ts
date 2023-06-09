@@ -28,10 +28,9 @@ async function getMonthlyEvents2(input: z.infer<typeof allowedDate>) {
 
     const { startWeekDay, monthLength } = dater.getMonthBoundaries(input.year, input.monthIndex)
 
-    const monthStarts = new Date(input.year, input.monthIndex, 1)
     const monthEnds = new Date(input.year, input.monthIndex + 1, 0)
-    let starts = new Date(input.year, input.monthIndex, 1)
-    let ends = new Date(input.year, input.monthIndex + 1, 1)
+    const starts = new Date(input.year, input.monthIndex, 1)
+    const ends = new Date(input.year, input.monthIndex + 1, 1)
 
     const oneWeek = 7
     const sixWeeks = 6 * oneWeek
