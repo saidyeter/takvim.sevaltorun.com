@@ -1,6 +1,7 @@
 const methods = {
     getMonthBoundaries,
-    getMonths
+    getMonths,
+    getLocaleDate
 }
 export default methods
 
@@ -64,3 +65,13 @@ const monthNames = [
     'Kasım',
     'Aralık',
 ]
+
+
+function getLocaleDate(ms: Date) {
+    return ms.toLocaleDateString("tr-TR", {
+        // year: "numeric",
+        month: "long",
+        day: "numeric",
+        // dateStyle:'long'
+    });
+}
