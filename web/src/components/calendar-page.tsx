@@ -1,90 +1,42 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/utils/api";
+import type { Event } from "@prisma/client";
+import { pickColor } from "~/server/color";
+import dater from "~/server/dater";
 
 type CellProps = {
+  //old
   dayNumber: number;
   color?: string;
+
+  //new
+  dayColor?: string;
+  day?: Date;
+  info?: string[];
 };
 
 const CalendarPage = (props: { year: number; monthIndex: number }) => {
   const [cal, setCal] = useState([] as CellProps[][]);
+  const [events, setevents] = useState([] as Event[]);
 
   const { data: months } = api.calendar.getRelatedMonths.useQuery({
     year: props.year,
     monthIndex: props.monthIndex,
   });
-  const { data: monthlyEvents } = api.calendar.getMonthlyEvents.useQuery(
+  api.calendar.tmpgetMonthlyEvents.useQuery(
     {
       ...props,
     },
     {
       enabled: !!months,
+      onSuccess: (data) => {
+        setCal(data.weeks);
+        setevents(data.events);
+      },
     }
   );
-
-  useEffect(() => {
-    if (!monthlyEvents) {
-      return;
-    }
-    const weeks: CellProps[][] = [];
-    let week: CellProps[] = [];
-    let dayNumber = 1;
-    for (
-      let i = 1;
-      i < monthlyEvents.monthLength + monthlyEvents.startWeekDay;
-      i++
-    ) {
-      if (i < monthlyEvents.startWeekDay) {
-        week.push({
-          dayNumber: -1,
-        });
-      } else {
-        let color: string | undefined = undefined;
-        const currentDayStarting = new Date(
-          months?.selectedDate.year ?? 0,
-          (months?.selectedDate.month ?? 0) - 1,
-          dayNumber
-        );
-        const currentDayEnding = new Date(
-          months?.selectedDate.year ?? 0,
-          (months?.selectedDate.month ?? 0) - 1,
-          dayNumber,
-          23,
-          59,
-          59
-        );
-        // currentDay.setHours(10)
-        const foundEvent = monthlyEvents.events.find(
-          (e) => e.starts <= currentDayEnding && e.ends >= currentDayStarting
-        );
-
-        if (foundEvent) {
-          color = pickColor(foundEvent.id);
-        }
-        week.push({
-          dayNumber,
-          color,
-        });
-        dayNumber++;
-      }
-      if (i > 0 && week.length % 7 == 0) {
-        weeks.push(week);
-        week = [];
-      }
-    }
-    if (week.length > 0) {
-      while (week.length % 7 != 0) {
-        week.push({
-          dayNumber: -1,
-        });
-      }
-      weeks.push(week);
-    }
-    // console.log(weeks);
-    setCal(weeks);
-  }, [monthlyEvents, months]);
 
   return (
     <>
@@ -124,7 +76,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
                   </div>
                 </Link>
               </div>
-              {!!monthlyEvents && (
+              {!!cal && (
                 <>
                   <div className="mt-4 flex w-full flex-col rounded-xl bg-white/10 p-4  text-white">
                     {cal.map((week, index) => {
@@ -133,7 +85,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
                   </div>
 
                   <div className="mt-2 flex w-full flex-col gap-1">
-                    {monthlyEvents.events.map((value, index) => {
+                    {events.map((value, index) => {
                       return (
                         <div
                           key={index}
@@ -141,8 +93,7 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
                           style={{ borderColor: pickColor(value.id) }}
                         >
                           <p className="font-light text-slate-300">
-                            {getLocaleDate(value.starts)}-
-                            {getLocaleDate(value.ends)}
+                            {getEventDates(value.starts, value.ends)}
                           </p>
                           <p className="font-semibold">{value.desc}</p>
                         </div>
@@ -163,100 +114,46 @@ function WeekRow(props: { week: CellProps[] }) {
   return (
     <div className="flex w-full justify-around">
       {props.week.map((day, index) => (
-        <WeekCell key={index} day={day.dayNumber} color={day.color} />
+        <WeekCell
+          key={index}
+          {...day}
+          //day={day.dayNumber} color={day.color}
+        />
       ))}
     </div>
   );
 }
 
-function WeekCell(props: { day: number; color?: string }) {
+function WeekCell(props: CellProps) {
   return (
     <>
-      <div className="relative flex h-16 w-full flex-col items-center justify-center rounded-md  text-2xl hover:bg-white/10">
-        {props.day === -1 ? (
-          <></>
-        ) : (
-          <>
-            <span>{props.day}</span>
-            {props.color && (
-              <>
-                <div
-                  style={{ backgroundColor: props.color }}
-                  className="absolute bottom-1 left-auto right-auto h-2 w-2 rounded-full"
-                />
-              </>
-            )}
-          </>
-        )}
+      <div className="flex h-16 w-full flex-col items-center justify-center rounded-md  hover:bg-white/10">
+        <div className="flex h-12 w-full flex-col items-center justify-center text-2xl">
+          <span style={{ color: props.dayColor }}>{props.day?.getDate()}</span>
+        </div>
+        <div className="flex h-4 w-full flex-row items-center justify-evenly">
+          {props.info?.map((e, i) => {
+            return (
+              <div
+                key={i}
+                style={{ backgroundColor: e }}
+                className="h-2 w-2 rounded-full"
+              />
+            );
+          })}
+        </div>
       </div>
     </>
   );
 }
 
-function getLocaleDate(ms: Date) {
-  return ms.toLocaleDateString("tr-TR", {
-    // year: "numeric",
-    month: "long",
-    day: "numeric",
-    // dateStyle:'long'
-  });
-}
-
-// function isColor(strColor: string) {
-//   const s = new Option().style;
-//   s.color = strColor;
-//   return s.color !== "";
-// }
-
 export default CalendarPage;
 
-function pickColor(id: string) {
-  const hash = Math.abs(hashCode(id));
-  const colorIndex = hash % colors.length;
-  //console.log(id, hash, colorIndex, colors[colorIndex]);
-  return colors[colorIndex];
-}
-
-function hashCode(value: string) {
-  let hash = 0,
-    i,
-    chr;
-  if (value.length === 0) return hash;
-  for (i = 0; i < value.length; i++) {
-    chr = value.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
+function getEventDates(starts: Date, ends: Date) {
+  starts.setHours(0, 0, 0, 0);
+  ends.setHours(0, 0, 0, 0);
+  if (starts.getTime() === ends.getTime()) {
+    return dater.getLocaleDate(starts);
   }
-  return hash;
+  return dater.getLocaleDate(starts) + "-" + dater.getLocaleDate(ends);
 }
-
-const colors = [
-  "#A6D0DD",
-  "#FF6969",
-  "#FFD3B0",
-  "#E8A0BF",
-  "#BA90C6",
-  "#C7E9B0",
-  "#CCD5AE",
-  "#FFB4B4",
-  "#FFACAC",
-  "#FFAACF",
-  "#FFCEFE",
-  "#F8CBA6",
-  "#CDE990",
-  "#8DCBE6",
-  "#FD8A8A",
-  "#BCEAD5",
-  "#9ED5C5",
-  "#BCCEF8",
-  "#ABD9FF",
-  "#FFABE1",
-  "#B1D7B4",
-  "#F7ECDE",
-  "#B2C8DF",
-  "#C4D7E0",
-  "#C7D36F",
-  "#E0DECA",
-  "#CDC2AE",
-  "#92B4EC",
-];
