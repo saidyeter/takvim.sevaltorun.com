@@ -7,7 +7,8 @@ export default {
     createEvent,
     getEvent,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    getMonthlyEvents2
 }
 
 
@@ -28,7 +29,7 @@ const eventApiResponseSchema = z.object({
     ends: z.string().datetime(),
     location: z.string().optional().nullable(),
 })
-const eventSchema = z.object({
+export const eventSchema = z.object({
     id: z.string(),
     createdAt: z.date(),
     desc: z.string(),
@@ -207,5 +208,69 @@ async function deleteEvent(id: string): Promise<boolean | undefined> {
         return true
     }
     console.log('unexpected status', res.status);
+    return undefined
+}
+
+
+export const dayResultSchema = z.object({
+    dayColor: z.string(),
+    day: z.date(),
+    info: z.string().array()
+})
+export const weekResultSchema = dayResultSchema.array()
+
+export const getMonthlyEventsResultSchema2 = z.object({
+    weeks: weekResultSchema.array(),
+    events: eventSchema.array()
+})
+
+const dayApiSchema = z.object({
+    dayColor: z.string(),
+    day: z.string().datetime(),
+    info: z.string().array()
+})
+const weekApiSchema = dayApiSchema.array()
+
+
+const getMonthlyEventsApiResponseSchema2 = z.object({
+    weeks: weekApiSchema.array(),
+    events: eventApiResponseSchema.array()
+})
+//getMonthlyEventsResultSchema
+
+//getMonthlyEventsApiResponseSchema2
+
+async function getMonthlyEvents2(params: z.infer<typeof allowedDate>): Promise<z.infer<typeof getMonthlyEventsResultSchema2> | undefined> {
+    const query = Object.entries(params).map(([key, val]) => `${key}=${encodeURIComponent(val)}`).join('&');
+    const url = baseUrl + '/calendar/events2?' + query
+    
+    const res = await fetch(url)
+    const resJson = await res.json()
+    const validation = getMonthlyEventsApiResponseSchema2.safeParse(resJson)
+    if (validation.success) {
+        const result = {
+            weeks: validation.data.weeks.map(e => {
+                return e.map(l => {
+                    return {
+                        dayColor: l.dayColor,
+                        day: new Date(l.day),
+                        info: l.info
+                    }
+                })
+            }),
+            events: validation.data.events.map(e => {
+                return {
+                    id: e.id,
+                    createdAt: new Date(e.createdAt),
+                    desc: e.desc,
+                    starts: new Date(e.starts),
+                    ends: new Date(e.ends),
+                    location: e.location
+                }
+            })
+        }
+        return getMonthlyEventsResultSchema2.parse(result)
+    }
+    console.log('calendar validation error', validation.error);
     return undefined
 }
