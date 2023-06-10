@@ -1,22 +1,20 @@
-import { Link } from "expo-router";
-import Calendar from "../components/calendar";
+import CalendarWrapper from "../components/calendar-wrapper";
 import { FlexView } from "../components/themed/flex-view";
 import { StatusBar } from "expo-status-bar";
-import { Label } from "../components/themed/label";
 
 export default function IndexPage() {
   return (
     <>
       <StatusBar style="light" />
-      <FlexView height="10%"/>
+      <FlexView height="5%"/>
       <FlexView
         noFlex
         padding={0}
-        height="80%"
+        height="90%"
       >
-        <Calendar />
+        <CalendarWrapper />
       </FlexView>
-      <FlexView height="10%"/>
+      <FlexView height="5%"/>
     </>
   );
 }
