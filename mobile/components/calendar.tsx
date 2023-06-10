@@ -1,383 +1,92 @@
-import { useEffect, useState } from "react";
-import api from "../api/client";
-import { useQuery } from "@tanstack/react-query";
-import { Pressable, ScrollView } from "react-native";
+import { z } from "zod";
+import { dayResultSchema, weekResultSchema } from "../api/client";
 import { FlexView } from "./themed/flex-view";
 import { Label } from "./themed/label";
-import { Link, useRouter } from "expo-router";
-import { Icon } from "./Icon";
+import { Text } from "react-native";
 
-type CellProps = {
-  dayNumber: number;
-  color?: string;
-};
-export default function Calendar() {
-  const { push } = useRouter();
-  const [selectedDate, setSelectedDate] = useState({
-    year: new Date().getFullYear(),
-    monthIndex: new Date().getMonth(),
-  });
-  const [cal, setCal] = useState([] as CellProps[][]);
-
-  const {
-    data: months,
-    refetch: refetchMonths,
-    isLoading: monthsLoading,
-  } = useQuery({
-    queryKey: ["months"],
-    queryFn: () =>
-      api.getRelatedMonths({
-        year: selectedDate.year,
-        monthIndex: selectedDate.monthIndex,
-      }),
-    onError: (err: any) => {
-      console.log("err", err);
-    },
-  });
-  const {
-    data: monthlyEvents,
-    refetch: refetchEvents,
-    isLoading: eventsLoading,
-  } = useQuery({
-    queryKey: ["events"],
-    queryFn: () =>
-      api.getMonthlyEvents({
-        year: selectedDate.year,
-        monthIndex: selectedDate.monthIndex,
-      }),
-  });
-
-  useEffect(() => {
-    refetchEvents();
-    refetchMonths();
-  }, [selectedDate]);
-
-  if (!eventsLoading && !monthlyEvents) {
-    console.log("data yoK");
-    // refetchEvents()
-  }
-
-  useEffect(() => {
-    if (!monthlyEvents) {
-      return;
-    }
-    const weeks: CellProps[][] = [];
-    let week: CellProps[] = [];
-    let dayNumber = 1;
-    for (
-      let i = 1;
-      i < monthlyEvents.monthLength + monthlyEvents.startWeekDay;
-      i++
-    ) {
-      if (i < monthlyEvents.startWeekDay) {
-        week.push({
-          dayNumber: -1,
-        });
-      } else {
-        let color: string | undefined = undefined;
-        const currentDayStarting = new Date(
-          months?.selectedDate.year ?? 0,
-          (months?.selectedDate.month ?? 0) - 1,
-          dayNumber
-        );
-        const currentDayEnding = new Date(
-          months?.selectedDate.year ?? 0,
-          (months?.selectedDate.month ?? 0) - 1,
-          dayNumber,
-          23,
-          59,
-          59
-        );
-        // currentDay.setHours(10)
-        const foundEvent = monthlyEvents.events.find(
-          (e) => e.starts <= currentDayEnding && e.ends >= currentDayStarting
-        );
-        // console.log(monthlyEvents);
-        if (foundEvent) {
-          color = pickColor(foundEvent.id);
-        } else {
-          // console.log(currentDayEnding);
-        }
-        week.push({
-          dayNumber,
-          color,
-        });
-        dayNumber++;
-      }
-      if (i > 0 && week.length % 7 == 0) {
-        weeks.push(week);
-        week = [];
-      }
-    }
-    if (week.length > 0) {
-      while (week.length % 7 != 0) {
-        week.push({
-          dayNumber: -1,
-        });
-      }
-      weeks.push(week);
-    }
-    // console.log(weeks);
-    setCal(weeks);
-  }, [monthlyEvents, months]);
-
+function Calendar(props: { weeks: z.infer<typeof weekResultSchema>[] }) {
+  const { weeks } = props;
   return (
     <FlexView
-      noFlex
-      height="100%"
+      height={64 * 6}
+      flex={0}
+      flexDirection="column"
+      marginTop={4}
     >
-      {!!months && (
-        <>
-          <FlexView
-            flexDirection="row"
-            alignItems="flex-end"
-          >
-            <FlexView flexDirection="column">
-              <Pressable
-                onPress={() => {
-                  setSelectedDate((p) => {
-                    const d = new Date(p.year, p.monthIndex, 1);
-                    d.setMonth(d.getMonth() - 1);
-                    return {
-                      year: d.getFullYear(),
-                      monthIndex: d.getMonth(),
-                    };
-                  });
-                }}
-              >
-                {({ pressed }) => (
-                  <>
-                    <Label color={pressed ? "white" : "grey"}>
-                      {months.previousDate.monthName}
-                    </Label>
-                    <Label color={pressed ? "white" : "grey"}>
-                      {months.previousDate.year}
-                    </Label>
-                  </>
-                )}
-              </Pressable>
-            </FlexView>
-            <FlexView flexDirection="column">
-              <Label size="l">{months.selectedDate.monthName}</Label>
-              <Label size="l">{months.selectedDate.year}</Label>
-            </FlexView>
-            <FlexView flexDirection="column">
-              <Pressable
-                onPress={() => {
-                  setSelectedDate((p) => {
-                    const d = new Date(p.year, p.monthIndex, 1);
-                    d.setMonth(d.getMonth() + 1);
-                    return {
-                      year: d.getFullYear(),
-                      monthIndex: d.getMonth(),
-                    };
-                  });
-                }}
-              >
-                {({ pressed }) => (
-                  <>
-                    <Label color={pressed ? "white" : "grey"}>
-                      {months.nextDate.monthName}
-                    </Label>
-                    <Label color={pressed ? "white" : "grey"}>
-                      {months.nextDate.year}
-                    </Label>
-                  </>
-                )}
-              </Pressable>
-            </FlexView>
-          </FlexView>
-          {!!monthlyEvents && !eventsLoading && (
-            <FlexView flex={5}>
-              <FlexView
-                height="55%"
-                flexDirection="column"
-                marginTop={4}
-              >
-                {cal.map((week, index) => {
-                  return (
-                    <WeekRow
-                      key={index}
-                      week={week}
-                    />
-                  );
-                })}
-              </FlexView>
-              <Link
-                href={{ pathname: "new" }}
-                style={{
-                  width: "100%",
-                  textAlign: "center",
-                  backgroundColor: "#15162c",
-                  padding: 5,
-                }}
-              >
-                <Icon
-                  name="plus-square-o"
-                  color="white"
-                  iconsize="xl"
-                />
-              </Link>
-              <FlexView
-                noFlex
-                height="40%"
-                marginTop={2}
-                gap={1}
-              >
-                <ScrollView>
-                  {monthlyEvents.events.map((value, index) => {
-                    return (
-                      <FlexView
-                        key={index}
-                        flexDirection="row"
-                        marginTop={12}
-                        gap={1}
-                        paddingLeft={4}
-                        borderColor={pickColor(value.id)}
-                        borderLeftWidth={6}
-                        borderBottomWidth={1}
-                      >
-                        <FlexView
-                          flexDirection="column"
-                          width="60%"
-                        >
-                          <Label
-                            fontWeight="600"
-                            textAlign="left"
-                          >
-                            {value.desc}
-                          </Label>
-                          <Label
-                            fontWeight="200"
-                            size="xs"
-                            textAlign="left"
-                          >
-                            {getLocaleDate(value.starts)}-
-                            {getLocaleDate(value.ends)}
-                          </Label>
-                        </FlexView>
-                        <Link
-                          href={{
-                            pathname: "/edit",
-                            params: { id: value.id },
-                          }}
-                        >
-                          <Icon name="pencil" color="white" />
-                        </Link>
-                      </FlexView>
-                    );
-                  })}
-                </ScrollView>
-              </FlexView>
-            </FlexView>
-          )}
-        </>
-      )}
+      {weeks?.map((week, index) => {
+        return (
+          <WeekRow
+            key={index}
+            week={week}
+          />
+        );
+      })}
     </FlexView>
   );
 }
 
-function WeekRow(props: { week: CellProps[] }) {
+export default Calendar;
+
+function WeekRow(props: { week: z.infer<typeof weekResultSchema> }) {
   return (
     <FlexView
       flexDirection="row"
       justifyContent="space-around"
+      height={64}
+      width="100%"
+      flex={0}
+      padding={0}
+      margin={0}
     >
       {props.week.map((day, index) => (
         <WeekCell
           key={index}
-          day={day.dayNumber}
-          color={day.color}
+          {...day}
         />
       ))}
     </FlexView>
   );
 }
-function WeekCell(props: { day: number; color?: string }) {
+function WeekCell(props: z.infer<typeof dayResultSchema>) {
   // console.log(props.color);
 
   return (
     <FlexView
       flexDirection="column"
-      width={32}
-      height={32}
+      // bg="red"
+      width={64}
+      height={64}
+      padding={0}
+      flex={0}
+      margin={0}
     >
-      {props.day === -1 ? (
-        <></>
-      ) : (
-        <>
-          <Label>{props.day}</Label>
-          {props.color && (
-            <FlexView
-              bg={props.color}
-              borderRadius={50}
-              width={2}
-              height={2}
-            />
-          )}
-        </>
-      )}
+      <FlexView
+        width={64}
+        height={48}
+        flex={0}
+        padding={0}
+        margin={0}
+      >
+        <Label size="l" color={props.dayColor}>{props.day.getDate()}</Label>
+      </FlexView>
+      <FlexView
+        width={64}
+        height={16}
+        flex={0}
+        padding={0}
+        margin={0}
+        flexDirection="row"
+        alignItems="flex-start"
+      >
+        {props.info?.map((e, i) => {
+          return (
+            <Text
+              key={i}
+              style={{ color: e, fontWeight:'bold',fontSize:32, lineHeight:22 }}
+            >{`·`}</Text>
+          );
+        })}
+      </FlexView>
     </FlexView>
   );
 }
-
-function getLocaleDate(ms: Date) {
-  return ms.toLocaleDateString("tr-TR", {
-    // year: "numeric",
-    month: "long",
-    day: "numeric",
-    // dateStyle:'long'
-  });
-}
-
-function pickColor(id: string) {
-  const hash = Math.abs(hashCode(id));
-  const colorIndex = hash % colors.length;
-  // console.log(id, hash, colorIndex, colors[colorIndex]);
-
-  return colors[colorIndex];
-}
-
-function hashCode(value: string) {
-  let hash = 0,
-    i,
-    chr;
-  if (value.length === 0) return hash;
-  for (i = 0; i < value.length; i++) {
-    chr = value.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-}
-
-const colors = [
-  "#A6D0DD",
-  "#FF6969",
-  "#FFD3B0",
-  "#E8A0BF",
-  "#BA90C6",
-  "#C7E9B0",
-  "#CCD5AE",
-  "#FFB4B4",
-  "#FFACAC",
-  "#FFAACF",
-  "#FFCEFE",
-  "#F8CBA6",
-  "#CDE990",
-  "#8DCBE6",
-  "#FD8A8A",
-  "#BCEAD5",
-  "#9ED5C5",
-  "#BCCEF8",
-  "#ABD9FF",
-  "#FFABE1",
-  "#B1D7B4",
-  "#F7ECDE",
-  "#B2C8DF",
-  "#C4D7E0",
-  "#C7D36F",
-  "#E0DECA",
-  "#CDC2AE",
-  "#92B4EC",
-];
