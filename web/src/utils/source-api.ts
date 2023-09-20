@@ -61,15 +61,15 @@ async function getMonthlyEvents(starts: Date, ends: Date) {
 async function singleEvent(id: number) {
 
     try {
-        const response = await fetch(baseUrl + "/takvim/Event/" + id, {
+        const response = await fetch(baseUrl + "/takvim/Event/" + id.toString(), {
             method: "GET",
             headers: {
                 'Authorization': apiKey
             },
         })
         if (response.ok) {
-            const data = await response.json()
-            return data as Event
+            const data = await response.json() as Event
+            return data 
         }
         else {
             console.log('not OK singleEvent', response.text());
@@ -96,7 +96,7 @@ async function createEvent(data: CreateEvent) {
 async function removeEvent(id: number) {
 
     try {
-        const response = await fetch(baseUrl + "/takvim/Event/" + id, {
+        const response = await fetch(baseUrl + "/takvim/Event/" + id.toString(), {
             method: "DELETE",
             headers: {
                 'Authorization': apiKey
@@ -116,7 +116,7 @@ async function updateEvent(id: number, data: CreateEvent) {
     console.log(1);
 
     try {
-        const response = await fetch(baseUrl + "/takvim/Event/" + id, {
+        const response = await fetch(baseUrl + "/takvim/Event/" + id.toString(), {
             method: "PATCH",
             headers: {
                 'content-type': 'application/json',

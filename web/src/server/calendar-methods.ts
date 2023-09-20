@@ -1,7 +1,8 @@
 import { z } from "zod"
 import dater from "./dater"
 import { pickColor } from "./color"
-import { getMonthlyEvents as M,Event } from "~/utils/source-api";
+import { getMonthlyEvents as M } from "~/utils/source-api";
+import type { Event } from "~/utils/source-api";
 
 export default {
     getMonthlyEvents,
@@ -128,7 +129,7 @@ async function getMonthlyEvents(input: z.infer<typeof allowedDate>) {
 
 
 async function getEvents(starts: Date, ends: Date) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
         return await M(starts, ends)
     } catch (error) {
