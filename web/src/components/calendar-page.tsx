@@ -31,7 +31,10 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
     },
     {
       enabled: !!months,
-      onSuccess: (data) => {
+      onSuccess: (data: {
+        weeks: CellProps[][];
+        events: Event[];
+      }) => {
         setCal(data.weeks);
         setevents(data.events);
       },
@@ -86,6 +89,8 @@ const CalendarPage = (props: { year: number; monthIndex: number }) => {
 
                   <div className="mt-2 flex w-full flex-col gap-1">
                     {events.map((value, index) => {
+                      console.log('events.map', value);
+
                       return (
                         <div
                           key={index}
@@ -117,7 +122,7 @@ function WeekRow(props: { week: CellProps[] }) {
         <WeekCell
           key={index}
           {...day}
-          //day={day.dayNumber} color={day.color}
+        //day={day.dayNumber} color={day.color}
         />
       ))}
     </div>

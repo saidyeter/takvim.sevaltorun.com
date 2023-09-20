@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import dater from "~/server/dater";
-import { prisma } from "~/server/db";
+import { getMonthlyEvents } from "~/utils/source-api";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -33,29 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const boundaries = dater.getMonthBoundaries(year, monthIndex)
   const monthStarts = new Date(year, monthIndex, 1)
   const monthEnds = new Date(year, monthIndex + 1, 1)
-  const events = await prisma.event.findMany({
-    where: {
-      OR: [
-        {
-          starts: {
-            gte: monthStarts,
-            lt: monthEnds,
-          },
-        },
-        {
-          ends: {
-            gte: monthStarts,
-            lt: monthEnds,
-          },
-        }
-      ]
-    },
-    orderBy:{
-      starts:'asc'
-    }
-
-  })
-
+  const events = await getMonthlyEvents(monthStarts,monthEnds)
+  
   return res.status(200).json({
     ...boundaries,
     events

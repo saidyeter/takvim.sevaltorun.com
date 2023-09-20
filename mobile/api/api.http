@@ -1,0 +1,39 @@
+@HostAddress = http://localhost:3000 
+@AuthKey = apikey
+ 
+POST {{HostAddress}}/api/calendar/event
+Content-Type: application/json
+Authorization: {{AuthKey}}
+
+{
+    "desc": "dumy",
+    "starts": "2023-09-20T18:25:43.511Z",
+    "ends": "2023-09-23T18:25:43.511Z",
+    "location": "z.string().optional()"
+}
+
+###
+GET {{HostAddress}}/api/calendar/events?year=2023&monthIndex=8
+Authorization: {{AuthKey}}
+
+###
+GET {{HostAddress}}/api/calendar/event?id=1
+Authorization: {{AuthKey}}
+
+###
+PUT  {{HostAddress}}/api/calendar/event?id=1
+Content-Type: application/json
+Authorization: {{AuthKey}}
+
+{
+    "desc": "dugun",
+    "starts": "2023-09-20T18:25:43.511Z",
+    "ends": "2023-09-23T18:25:43.511Z",
+    "location": "lo"
+}
+
+###
+DELETE {{HostAddress}}/api/calendar/event?id=2
+Authorization: {{AuthKey}}
+
+###

@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import { prisma } from "~/server/db";
 
 import { env } from "~/env.mjs";
+import { createEvent, removeEvent, singleEvent, updateEvent } from "~/utils/source-api";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('event');
@@ -28,20 +28,17 @@ async function Get(req: NextApiRequest, res: NextApiResponse) {
 
 
   const bodySchema = z.object({
-    id: z.string()
+    id: z.string().transform(n => parseInt(n))
   })
   const validation = bodySchema.safeParse({ id })
-  console.log(validation);
+  console.log('validation error', id, validation);
 
   if (!validation.success) {
     return res.status(400).json(validation.error)
   }
   const { id: validId } = validation.data
-  const event = await prisma.event.findFirst({
-    where: {
-      id: validId
-    }
-  })
+  const event = await singleEvent(validId)
+
   if (event) {
     return res.status(201).json(event)
   }
@@ -78,14 +75,13 @@ async function Post(req: NextApiRequest, res: NextApiResponse) {
   }
   const { desc, starts, ends, location } = validation.data
 
-  const events = await prisma.event.create({
-    data: {
-      desc,
-      starts: new Date(starts),
-      ends: new Date(ends),
-      location
-    }
+  const events = await createEvent({
+    desc,
+    starts: new Date(starts),
+    ends: new Date(ends),
+    location: location
   })
+
   return res.status(201).json(events)
 }
 
@@ -107,7 +103,7 @@ async function Update(req: NextApiRequest, res: NextApiResponse) {
 
 
   const querySchema = z.object({
-    id: z.string()
+    id: z.string().transform(n => parseInt(n))
   })
   const queryValidation = querySchema.safeParse({ id })
   console.log(queryValidation);
@@ -125,23 +121,18 @@ async function Update(req: NextApiRequest, res: NextApiResponse) {
     location: z.string().optional(),
   })
   const validation = bodySchema.safeParse(req.body)
-  console.log(validation);
+  // console.log(validation);
 
   if (!validation.success) {
     return res.status(400).json(validation.error)
   }
   const { desc, starts, ends, location } = validation.data
 
-  const event = await prisma.event.update({
-    where: {
-      id: validId
-    },
-    data: {
-      desc,
-      starts: new Date(starts),
-      ends: new Date(ends),
-      location
-    }
+  const event = await updateEvent(validId, {
+    desc,
+    starts: new Date(starts),
+    ends: new Date(ends),
+    location
   })
   return res.status(200).json(event)
 }
@@ -166,7 +157,7 @@ async function Remove(req: NextApiRequest, res: NextApiResponse) {
 
 
   const querySchema = z.object({
-    id: z.string()
+    id: z.string().transform(n => parseInt(n))
   })
   const queryValidation = querySchema.safeParse({ id })
   console.log(queryValidation);
@@ -176,21 +167,15 @@ async function Remove(req: NextApiRequest, res: NextApiResponse) {
   }
   const { id: validId } = queryValidation.data
 
-  const event = await prisma.event.findFirst({
-    where: {
-      id: validId
-    }
-  })
+  const event = await singleEvent(validId)
+
   if (!event) {
     return res.status(200).json({
       msg: 'OK'
     })
   }
 
-  const removedEvent = await prisma.event.delete({
-    where: {
-      id: validId
-    }
-  })
+  const removedEvent = await removeEvent(validId)
+
   return res.status(200).json(removedEvent)
 }

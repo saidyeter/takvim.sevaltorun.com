@@ -1,7 +1,7 @@
 import { z } from "zod"
 import dater from "./dater"
-import { prisma } from "./db"
 import { pickColor } from "./color"
+import { getMonthlyEvents as M,Event } from "~/utils/source-api";
 
 export default {
     getMonthlyEvents,
@@ -80,10 +80,10 @@ async function getMonthlyEvents2(input: z.infer<typeof allowedDate>) {
 
         events
             .filter(
-                (e) => e.starts <= currentDayEnding && e.ends >= currentDayStarting
+                (e:Event) => e.starts <= currentDayEnding && e.ends >= currentDayStarting
             )
             .forEach(
-                (e) => {
+                (e:Event) => {
                     cell.info?.push(pickColor(e.id))
                 }
             )
@@ -128,29 +128,14 @@ async function getMonthlyEvents(input: z.infer<typeof allowedDate>) {
 
 
 async function getEvents(starts: Date, ends: Date) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    try {
+        return await M(starts, ends)
+    } catch (error) {
+        console.log('getEvents error: ', error);
 
-    return await prisma.event.findMany({
-        where: {
-            OR: [
-                {
-                    starts: {
-                        gt: starts,
-                        lt: ends,
-                    },
-                },
-                {
-                    ends: {
-                        gt: starts,
-                        lt: ends,
-                    },
-                }
-            ]
-        },
-        orderBy: {
-            starts: 'asc'
-        }
-
-    })
+    }
+    return []
 }
 
 
