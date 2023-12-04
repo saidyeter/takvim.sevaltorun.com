@@ -2,17 +2,42 @@ import Link from "next/link"
 
 import { dayInfo, getEvents } from "@/lib/source-api"
 
-export default async function IndexPage() {
-  const d = await getEvents(2023, 2)
-  if (!d) {
+export default async function IndexPage({
+  searchParams,
+}: {
+  searchParams: { y: string; m: string }
+}) {
+  const now = new Date()
+  const year =
+    searchParams &&
+    searchParams.y &&
+    !Number.isNaN(parseInt(searchParams.y)) &&
+    parseInt(searchParams.y) > 2020 &&
+    parseInt(searchParams.y) < 2030
+      ? parseInt(searchParams.y)
+      : now.getFullYear()
+
+  const month =
+    searchParams &&
+    searchParams.m &&
+    !Number.isNaN(parseInt(searchParams.m)) &&
+    parseInt(searchParams.m) > 0 &&
+    parseInt(searchParams.m) < 13
+      ? parseInt(searchParams.m)
+      : now.getMonth() + 1
+
+  //   console.log(searchParams)
+
+  const data = await getEvents(year, month)
+  if (!data) {
     return <>bir hata olustu</>
   }
-  //   console.log("data", d)
+  // console.log("data", d)
 
   return (
     <section className="md:container p-2 flex flex-col justify-center items-center md:py-10 py-4">
       <div className="w-full text-2xl font-bold">
-        {d.months.selectedDate.name} {d.months.selectedDate.year}
+        {data.months.selectedDate.name} {data.months.selectedDate.year}
       </div>
 
       <div className="mt-4 flex w-full flex-col rounded-lg bg-muted md:p-4 p-1">
@@ -21,30 +46,32 @@ export default async function IndexPage() {
             <HeaderCell txt={v} key={i} />
           ))}
         </div>
-        {d.weeks.map((week, index) => {
+        {data.weeks.map((week, index) => {
           return <WeekRow key={index} week={week} />
         })}
       </div>
       <div className="flex w-full items-end justify-between my-4">
         <Link
-          href={`${d.months.previousDate.year}-${d.months.previousDate.month}`}
+          href={`?y=${data.months.previousDate.year}&m=${data.months.previousDate.month}`}
         >
           <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
             <span>
-              {d.months.previousDate.name} {d.months.previousDate.year}
+              {data.months.previousDate.name} {data.months.previousDate.year}
             </span>
           </div>
         </Link>
-        <Link href={`${d.months.nextDate.year}-${d.months.nextDate.month}`}>
+        <Link
+          href={`?y=${data.months.nextDate.year}&m=${data.months.nextDate.month}`}
+        >
           <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
             <span>
-              {d.months.nextDate.name} {d.months.nextDate.year}
+              {data.months.nextDate.name} {data.months.nextDate.year}
             </span>
           </div>
         </Link>
       </div>
       <div className="flex w-full flex-col gap-2">
-        {d.events.map((value, index) => {
+        {data.events.map((value, index) => {
           return (
             <div
               key={index}
