@@ -1,37 +1,21 @@
 import Link from "next/link"
+
 import { dayInfo, getEvents } from "@/lib/source-api"
 
 export default async function IndexPage() {
   const d = await getEvents(2023, 2)
   if (!d) {
-    return <>loading...</>
+    return <>bir hata olustu</>
   }
-//   console.log("data", d)
+  //   console.log("data", d)
 
   return (
-    <section className="md:container p-2 flex flex-col justify-center items-center gap-6 pb-8 pt-6 md:py-10 py-4">
-      <div className="flex w-full items-end justify-between">
-        <Link
-          href={`${d.months.previousDate.year}-${d.months.previousDate.month}`}
-        >
-          <div className="flex flex-col items-center justify-center text-xl text-muted-foreground hover:text-primary">
-            <span>{d.months.previousDate.name}</span>
-            <span>{d.months.previousDate.year}</span>
-          </div>
-        </Link>
-        <div className="flex flex-col items-center justify-center text-2xl font-bold ">
-          <span>{d.months.selectedDate.name}</span>
-          <span>{d.months.selectedDate.year}</span>
-        </div>
-        <Link href={`${d.months.nextDate.year}-${d.months.nextDate.month}`}>
-          <div className="flex flex-col items-center justify-center text-xl text-muted-foreground hover:text-primary">
-            <span>{d.months.nextDate.name}</span>
-            <span>{d.months.nextDate.year}</span>
-          </div>
-        </Link>
+    <section className="md:container p-2 flex flex-col justify-center items-center md:py-10 py-4">
+      <div className="w-full text-2xl font-bold">
+        {d.months.selectedDate.name} {d.months.selectedDate.year}
       </div>
 
-      <div className="mt-4 flex w-full flex-col rounded-xl bg-white/10 md:p-4 p-1">
+      <div className="mt-4 flex w-full flex-col rounded-lg bg-muted md:p-4 p-1">
         <div className="flex w-full space-x-1">
           {["Pts", "Sal", "Crs", "Prs", "Cum", "Cts", "Pzr"].map((v, i) => (
             <HeaderCell txt={v} key={i} />
@@ -41,16 +25,33 @@ export default async function IndexPage() {
           return <WeekRow key={index} week={week} />
         })}
       </div>
-
-      <div className="mt-2 flex w-full flex-col gap-1">
+      <div className="flex w-full items-end justify-between my-4">
+        <Link
+          href={`${d.months.previousDate.year}-${d.months.previousDate.month}`}
+        >
+          <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
+            <span>
+              {d.months.previousDate.name} {d.months.previousDate.year}
+            </span>
+          </div>
+        </Link>
+        <Link href={`${d.months.nextDate.year}-${d.months.nextDate.month}`}>
+          <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
+            <span>
+              {d.months.nextDate.name} {d.months.nextDate.year}
+            </span>
+          </div>
+        </Link>
+      </div>
+      <div className="flex w-full flex-col gap-2">
         {d.events.map((value, index) => {
           return (
             <div
               key={index}
-              className={`flex w-full flex-col gap-1 border-l-8 bg-white/10 p-2 pl-4 text-white`}
+              className={`flex w-full flex-col rounded-lg gap-1 border-l-8 bg-muted p-2 pl-4`}
               style={{ borderColor: value.dayColor }}
             >
-              <p className="font-light text-slate-300">
+              <p className="text-muted-foreground">
                 {getEventDates(new Date(value.starts), new Date(value.ends))}
               </p>
               <p className="font-semibold">{value.desc}</p>
@@ -113,7 +114,7 @@ function WeekCell(props: dayInfo) {
             <div
               key={i}
               style={{ backgroundColor: e }}
-              className="md:h-2 md:w-2 w-1 h-1 rounded-full"
+              className="md:h-2 md:w-2 w-2 h-2 rounded-full"
             />
           )
         })}
@@ -124,7 +125,7 @@ function WeekCell(props: dayInfo) {
 
 function HeaderCell(props: { txt: string }) {
   return (
-    <div className="flex bg-muted rounded-lg md:h-12 h-8 w-full flex-col items-center justify-center md:text-2xl text-muted-foreground font-bold ">
+    <div className="flex rounded-lg md:h-12 h-8 w-full flex-col items-center justify-center md:text-2xl text-muted-foreground font-bold ">
       {props.txt}
     </div>
   )
