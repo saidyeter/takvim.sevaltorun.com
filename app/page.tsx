@@ -1,8 +1,8 @@
 
 import { dayInfo, getEvents } from "@/lib/source-api"
-// const delay = (delayInms: number) => {
-//   return new Promise(resolve => setTimeout(resolve, delayInms));
-// };
+const delay = (delayInms: number) => {
+  return new Promise(resolve => setTimeout(resolve, delayInms));
+};
 
 export default async function IndexPage({
   searchParams,
@@ -10,7 +10,7 @@ export default async function IndexPage({
   searchParams: { y: string; m: string }
 }) {
 
-  // await delay(5000)
+  await delay(5000)
   const now = new Date()
   const year =
     searchParams &&
@@ -39,7 +39,7 @@ export default async function IndexPage({
   // console.log("data", d)
 
   return (
-    <section className="md:container p-2 flex flex-col justify-center items-center md:py-10 py-4">
+    <section className="md:container md:max-w-5xl p-2 flex flex-col justify-center items-center md:py-10 py-4">
       <div className="w-full text-2xl font-bold">
         {data.months.selectedDate.name} {data.months.selectedDate.year}
       </div>

@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 export default async function Loading() {
 
   return (
-    <section className="md:container p-2 flex flex-col justify-center items-center md:py-10 py-4">
+    <section className="md:container md:max-w-5xl p-2 flex flex-col justify-center items-center md:py-10 py-4">
       <div className="w-full text-2xl font-bold">
         <Skeleton className="w-40 h-8 rounded-lg" />
       </div>
