@@ -1,12 +1,16 @@
-import Link from "next/link"
 
 import { dayInfo, getEvents } from "@/lib/source-api"
+// const delay = (delayInms: number) => {
+//   return new Promise(resolve => setTimeout(resolve, delayInms));
+// };
 
 export default async function IndexPage({
   searchParams,
 }: {
   searchParams: { y: string; m: string }
 }) {
+
+  // await delay(5000)
   const now = new Date()
   const year =
     searchParams &&
@@ -51,7 +55,7 @@ export default async function IndexPage({
         })}
       </div>
       <div className="flex w-full items-end justify-between my-4">
-        <Link
+        <a
           href={`?y=${data.months.previousDate.year}&m=${data.months.previousDate.month}`}
         >
           <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
@@ -59,8 +63,8 @@ export default async function IndexPage({
               {data.months.previousDate.name} {data.months.previousDate.year}
             </span>
           </div>
-        </Link>
-        <Link
+        </a>
+        <a
           href={`?y=${data.months.nextDate.year}&m=${data.months.nextDate.month}`}
         >
           <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
@@ -68,7 +72,7 @@ export default async function IndexPage({
               {data.months.nextDate.name} {data.months.nextDate.year}
             </span>
           </div>
-        </Link>
+        </a>
       </div>
       <div className="flex w-full flex-col gap-2">
         {data.events.map((value, index) => {
