@@ -1,8 +1,10 @@
 
+import { Button } from "@/components/ui/button";
 import { dayInfo, getEvents } from "@/lib/source-api"
-const delay = (delayInms: number) => {
-  return new Promise(resolve => setTimeout(resolve, delayInms));
-};
+import Link from "next/link";
+// const delay = (delayInms: number) => {
+//   return new Promise(resolve => setTimeout(resolve, delayInms));
+// };
 
 export default async function IndexPage({
   searchParams,
@@ -10,23 +12,23 @@ export default async function IndexPage({
   searchParams: { y: string; m: string }
 }) {
 
-  await delay(5000)
+  // await delay(5000)
   const now = new Date()
   const year =
     searchParams &&
-    searchParams.y &&
-    !Number.isNaN(parseInt(searchParams.y)) &&
-    parseInt(searchParams.y) > 2020 &&
-    parseInt(searchParams.y) < 2030
+      searchParams.y &&
+      !Number.isNaN(parseInt(searchParams.y)) &&
+      parseInt(searchParams.y) > 2020 &&
+      parseInt(searchParams.y) < 2030
       ? parseInt(searchParams.y)
       : now.getFullYear()
 
   const month =
     searchParams &&
-    searchParams.m &&
-    !Number.isNaN(parseInt(searchParams.m)) &&
-    parseInt(searchParams.m) > 0 &&
-    parseInt(searchParams.m) < 13
+      searchParams.m &&
+      !Number.isNaN(parseInt(searchParams.m)) &&
+      parseInt(searchParams.m) > 0 &&
+      parseInt(searchParams.m) < 13
       ? parseInt(searchParams.m)
       : now.getMonth() + 1
 
@@ -40,8 +42,11 @@ export default async function IndexPage({
 
   return (
     <section className="md:container md:max-w-5xl p-2 flex flex-col justify-center items-center md:py-10 py-4">
-      <div className="w-full text-2xl font-bold">
-        {data.months.selectedDate.name} {data.months.selectedDate.year}
+      <div className="w-full flex items-center justify-between">
+        <span className="w-full text-2xl font-bold">
+          {data.months.selectedDate.name} {data.months.selectedDate.year}
+        </span>
+        <Link href='/event/add'>Yeni</Link>
       </div>
 
       <div className="mt-4 flex w-full flex-col rounded-lg bg-muted md:p-4 p-1">
@@ -124,7 +129,7 @@ function WeekRow(props: { week: dayInfo[] }) {
         <WeekCell
           key={index}
           {...day}
-          //day={day.dayNumber} color={day.color}
+        //day={day.dayNumber} color={day.color}
         />
       ))}
     </div>
