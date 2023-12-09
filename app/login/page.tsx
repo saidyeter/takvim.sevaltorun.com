@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import z from 'zod'
 
-const signInSchema= z.object({
-  pincode:z.string()
+const signInSchema = z.object({
+  pincode: z.string()
 })
 
 export type TSignInSchema = z.infer<typeof signInSchema>;
@@ -39,13 +39,15 @@ export default function LoginPage() {
   return (
     <div className="w-1/2 m-auto pt-4">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-2">
-    
+
 
         <Input
           {...register("pincode")}
           type="password"
           placeholder="Parola"
           className="px-4 py-2 rounded"
+          pattern="[0-9]*"
+          inputMode="numeric"
         />
         {errors.pincode && (
           <p className="text-red-500">{`${errors.pincode.message}`}</p>
