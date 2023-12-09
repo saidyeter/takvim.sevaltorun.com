@@ -17,7 +17,7 @@ export type TSignInSchema = z.infer<typeof signInSchema>;
 
 export default function LoginPage() {
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/admin'
+  const callbackUrl = searchParams.get('callbackUrl') || '/'
   const error = searchParams.get('error') ? 'Kullanıcı adı veya parola hatalı!' : ''
   const {
     register,
