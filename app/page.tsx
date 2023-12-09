@@ -100,7 +100,7 @@ export default async function IndexPage({
               </div>
               <div className='flex w-1/3 justify-end items-center'>
                 {!!user &&
-                  <Link href={`/event/${value.id}`}>Yeni</Link>
+                  <Link href={`/event/${value.id}`}>Duzenle</Link>
                 }
               </div>
             </div>
