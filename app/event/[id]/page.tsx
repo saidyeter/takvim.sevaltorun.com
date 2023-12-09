@@ -22,7 +22,7 @@ export default async function EditEventPage({ params }: { params: { id: string }
           <Link href="/" className="underline">tıklayınız</Link>
         </span>
         <span>
-        yo  <DeleteButton id={eventId} />
+          <DeleteButton id={eventId} />
         </span>
       </div>
       <EventForm role="edit" defaultVal={data} id={eventId} />

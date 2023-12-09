@@ -1,11 +1,11 @@
 
-import { Button } from "@/components/ui/button";
 import { dayInfo, getEvents } from "@/lib/source-api"
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-// const delay = (delayInms: number) => {
-//   return new Promise(resolve => setTimeout(resolve, delayInms));
-// };
+import {
+  CalendarPlus as Create,
+  PenBox as Edit
+} from "lucide-react";
 
 export default async function IndexPage({
   searchParams,
@@ -13,7 +13,6 @@ export default async function IndexPage({
   searchParams: { y: string; m: string }
 }) {
   const user = await getServerSession()
-  // await delay(5000)
   const now = new Date()
   const year =
     searchParams &&
@@ -33,13 +32,10 @@ export default async function IndexPage({
       ? parseInt(searchParams.m)
       : now.getMonth() + 1
 
-  //   console.log(searchParams)
-
   const data = await getEvents(year, month)
   if (!data) {
     return <>bir hata olustu</>
   }
-  // console.log("data", d)
 
   return (
     <section className="flex flex-col justify-center items-center md:py-10">
@@ -48,7 +44,7 @@ export default async function IndexPage({
           {data.months.selectedDate.name} {data.months.selectedDate.year}
         </span>
         {!!user &&
-          <Link href='/event/add'>Yeni</Link>
+          <Link href='/event/add'><Create /></Link>
         }
       </div>
 
@@ -100,7 +96,7 @@ export default async function IndexPage({
               </div>
               <div className='flex w-1/3 justify-end items-center'>
                 {!!user &&
-                  <Link href={`/event/${value.id}`}>Duzenle</Link>
+                  <Link href={`/event/${value.id}`}><Edit /></Link>
                 }
               </div>
             </div>
@@ -130,7 +126,6 @@ function getLocaleDate(ms: Date) {
     // year: "numeric",
     month: "long",
     day: "numeric",
-    // dateStyle:'long'
   })
 }
 
@@ -141,7 +136,6 @@ function WeekRow(props: { week: dayInfo[] }) {
         <WeekCell
           key={index}
           {...day}
-        //day={day.dayNumber} color={day.color}
         />
       ))}
     </div>
