@@ -58,7 +58,6 @@ export default function EventForm(props: EventFormProps) {
     }
   };
 
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-2">
@@ -123,7 +122,7 @@ export default function EventForm(props: EventFormProps) {
           <Button
             type="submit"
           >
-            {props.role == 'add' ? 'Ekle' : "Kaydet"}
+            {props.role == 'add' ? 'Ekle' : "Değişiklikleri Kaydet"}
           </Button>
         }
       </form>
