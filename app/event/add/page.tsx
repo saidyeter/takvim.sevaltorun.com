@@ -3,82 +3,137 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import z from 'zod'
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { createEventRequestSchema } from "@/lib/source-api";
+import { createEvent } from "@/lib/actions";
 
-const addEventSchema= z.object({
-  starts:z.string().transform(p=> new Date(p)),
-  ends:z.string().transform(p=> new Date(p)),
-  desc: z.string()
+const createEventFormSchema = z.object({
+  starts: z.string(),
+  ends: z.string(),
+  desc: z.string().min(4, 'En az 4 karakter giriniz')
 })
+  .refine((data) => new Date(data.starts) <= new Date(data.ends), {
+    message: "Başlangıç tarihi bitiş tarihinden sonra olamaz",
+    path: ["starts", "ends"],
+  })
 
-export type TAddEventSchema = z.infer<typeof addEventSchema>;
+
+export type TCreateEventFormSchema = z.infer<typeof createEventFormSchema>;
 
 export default function AddEventPage() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<TAddEventSchema>({
-    resolver: zodResolver(addEventSchema),
-    defaultValues:{
-      desc:'',
-      starts:new Date(),
-      ends:new Date()
+  const form = useForm<TCreateEventFormSchema>({
+    resolver: zodResolver(createEventFormSchema),
+    defaultValues: {
+      desc: '',
+      starts: getLocaleDate(new Date()),
+      ends: getLocaleDate(new Date())
     }
   });
 
-  const onSubmit = async (data: TAddEventSchema) => {
-    console.log(data);
-    
+  const onSubmit = async (data: TCreateEventFormSchema) => {
+
+    console.log(1);
+
+    const aaa = await createEvent(createEventRequestSchema.parse(data))
+    console.log(2, aaa);
+
   };
 
 
   return (
-    <div className="w-1/2 m-auto pt-4">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-2">
+    <Form {...form}>
 
-      <Input
-          {...register("starts")}
-          type="date"
-          placeholder="Baslangic tarihi"
-          className="px-4 py-2 rounded"
-        />
-        {errors.starts && (
-          <p className="text-red-500">{`${errors.starts.message}`}</p>
-        )}
+      <Label>Geri dönmek için&nbsp;
+        <Link href="/" className="underline">tıklayınız</Link>
+      </Label>
+      <br />
+      <br />
 
-        <Input
-          {...register("ends")}
-          type="date"
-          placeholder="Bitis tarihi"
-          className="px-4 py-2 rounded"
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-2">
+        <FormField
+          control={form.control}
+          name="starts"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Başlangıç tarihi</FormLabel>
+              <FormControl>
+                <Input
+                  type="date"
+                  className="px-4 py-2 rounded"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription />
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.ends && (
-          <p className="text-red-500">{`${errors.ends.message}`}</p>
-        )}
+        <FormField
+          control={form.control}
+          name="ends"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bitiş tarihi</FormLabel>
+              <FormControl>
+                <Input
+                  type="date"
+                  className="px-4 py-2 rounded"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <Input
-          {...register("desc")}
-          type="text"
-          placeholder="Aciklama"
-          className="px-4 py-2 rounded"
+        <FormField
+          control={form.control}
+          name="desc"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Açıklama</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="Açıklama"
+                  className="px-4 py-2 rounded"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription />
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.desc && (
-          <p className="text-red-500">{`${errors.desc.message}`}</p>
-        )}
-        <Button
-          disabled={isSubmitting}
-          type="submit"
-        >
-          Ekle
-        </Button>
-        {/* {error && (
-          <p className="text-red-500 text-center">{`${error}`}</p>
-        )} */}
+        {form.formState.isSubmitting ?
+          <Label>Ekleniyor</Label> :
+          <Button
+            type="submit"
+          >
+            Ekle
+          </Button>
+        }
       </form>
-    </div>
+    </Form>
   );
+}
+
+function getLocaleDate(ms: Date) {
+  return ms.getFullYear() + '-' +
+    (ms.getMonth() + 1).toString().padStart(2, '0') + '-' +
+    ms.getDate().toString().padStart(2, '0')
 }

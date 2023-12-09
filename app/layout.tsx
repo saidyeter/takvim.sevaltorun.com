@@ -20,8 +20,6 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: "/calendar.svg",
-    // shortcut: "/favicon-16x16.png",
-    // apple: "/apple-touch-icon.png",
   },
 }
 
@@ -42,7 +40,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         >
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="relative flex min-h-screen flex-col">
-              <div className="flex-1">{children}</div>
+              <div className="flex-1 md:container md:max-w-5xl p-4">{children}</div>
               <SiteFooter/>
             </div>
             <TailwindIndicator />

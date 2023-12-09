@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { dayInfo, getEvents } from "@/lib/source-api"
 import Link from "next/link";
+import { getServerSession } from "next-auth";
 // const delay = (delayInms: number) => {
 //   return new Promise(resolve => setTimeout(resolve, delayInms));
 // };
@@ -11,7 +12,7 @@ export default async function IndexPage({
 }: {
   searchParams: { y: string; m: string }
 }) {
-
+  const user = await getServerSession()
   // await delay(5000)
   const now = new Date()
   const year =
@@ -41,12 +42,14 @@ export default async function IndexPage({
   // console.log("data", d)
 
   return (
-    <section className="md:container md:max-w-5xl p-2 flex flex-col justify-center items-center md:py-10 py-4">
+    <section className="flex flex-col justify-center items-center md:py-10">
       <div className="w-full flex items-center justify-between">
         <span className="w-full text-2xl font-bold">
           {data.months.selectedDate.name} {data.months.selectedDate.year}
         </span>
-        <Link href='/event/add'>Yeni</Link>
+        {!!user &&
+          <Link href='/event/add'>Yeni</Link>
+        }
       </div>
 
       <div className="mt-4 flex w-full flex-col rounded-lg bg-muted md:p-4 p-1">

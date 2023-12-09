@@ -1,11 +1,14 @@
 // import { TNewQuestionSchema, TNewSurveyValidationSchema, TQuestionAnswersFormSchema, TQuestionAnswersReqSchema, checkNewSurveyIsAllowedResponse, checkPreSurveyExistsScheme, getActiveSurveyResponseSchema, getSurveySchema, getSurveysResponseSchema, getUserSchema, partipiciantValidationResponseSchema, questionsResponseSchema, surveyDetailSchema, surveySchema } from "./types"
 
+import { z } from "zod"
+
 const { env } = process
 const baseUrl = env.DB_API_URL
 const apiKey = env.DB_API_KEY ?? ''
 
 export {
-    getEvents
+    getEvents,
+    createEvent
 }
 
 function beforeReq() {
@@ -48,6 +51,7 @@ interface GetEventsResult {
     events: event[],
     months:months
 }
+
 async function getEvents(year: number, month: number) {
     beforeReq()
     const url = encodeURI(baseUrl + "/takvim/?year=" + year + "&month=" + month)
@@ -71,6 +75,41 @@ async function getEvents(year: number, month: number) {
 
     return undefined
 }
+
+export const createEventRequestSchema = z.object({
+    starts: z.string().transform(p => new Date(p)),
+    ends: z.string().transform(p => new Date(p)),
+    desc: z.string()
+  })
+ export type TCreateEventRequestSchema = z.infer<typeof createEventRequestSchema>;
+
+
+async function createEvent(req: TCreateEventRequestSchema) {
+  beforeReq()
+  const url = encodeURI(baseUrl + "/takvim/event")
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': apiKey
+      },
+      body: JSON.stringify(req),
+      cache: 'no-cache'
+    })
+    if (response.ok) {
+      return true
+    }
+    console.log("createNewQuestion", response.status, await response.text(), url)
+
+  } catch (error) {
+    console.log("createNewQuestion error", error);
+  }
+
+  return false
+}
+
 
 // async function finishSurvey() {
 //   beforeReq()
@@ -263,31 +302,6 @@ async function getEvents(year: number, month: number) {
 // }
 
 
-// async function createNewQuestion(req: TNewQuestionSchema) {
-//   beforeReq()
-//   const url = encodeURI(baseUrl + "/question")
-
-//   try {
-//     const response = await fetch(url, {
-//       method: "POST",
-//       headers: {
-//         'content-type': 'application/json',
-//         'Authorization': apiKey
-//       },
-//       body: JSON.stringify(req),
-//       cache: 'no-cache'
-//     })
-//     if (response.ok) {
-//       return true
-//     }
-//     console.log("createNewQuestion", response.status, await response.text(), url)
-
-//   } catch (error) {
-//     console.log("createNewQuestion error", error);
-//   }
-
-//   return false
-// }
 
 // async function getSurvey(surveyId: number) {
 //   beforeReq()
