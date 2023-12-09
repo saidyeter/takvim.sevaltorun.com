@@ -13,8 +13,7 @@ const handler = NextAuth({
         pincode: { label: "Pin kodu", type: "password" },
       },
       async authorize(credentials, req) {
-        if (credentials?.pincode === 'temp1024' ||
-          credentials?.pincode === process.env.PINCODE) {
+        if (credentials?.pincode === process.env.PINCODE) {
           return { id: 'admin', name: 'admin' }
         }
 
