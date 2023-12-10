@@ -40,12 +40,21 @@ export default async function IndexPage({
   return (
     <section className="flex flex-col justify-center items-center md:py-10">
       <div className="w-full flex items-center justify-between">
-        <span className="w-full text-2xl font-bold">
-          {data.months.selectedDate.name} {data.months.selectedDate.year}
-        </span>
-        {!!user &&
-          <Link href='/event/add'><Create /></Link>
-        }
+        <div className="w-1/3 flex justify-start items-center">
+          <span className="text-2xl font-bold">
+            {data.months.selectedDate.name} {data.months.selectedDate.year}
+          </span>
+        </div>
+        <div className="w-1/3 flex justify-center items-center">
+          <Link href='/' className="text-[#7071E8]">Bugün</Link>
+        </div>
+        <div className="w-1/3 flex justify-end items-center">
+          <Link href='/event/add'>
+            {!!user &&
+              <Create />
+            }
+          </Link>
+        </div>
       </div>
 
       <div className="mt-4 flex w-full flex-col rounded-lg bg-muted md:p-4 p-1">
@@ -59,24 +68,20 @@ export default async function IndexPage({
         })}
       </div>
       <div className="flex w-full items-end justify-between my-4">
-        <a
-          href={`?y=${data.months.previousDate.year}&m=${data.months.previousDate.month}`}
-        >
+        <Link href={`?y=${data.months.previousDate.year}&m=${data.months.previousDate.month}`}>
           <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
             <span>
               {data.months.previousDate.name} {data.months.previousDate.year}
             </span>
           </div>
-        </a>
-        <a
-          href={`?y=${data.months.nextDate.year}&m=${data.months.nextDate.month}`}
-        >
+        </Link>
+        <Link href={`?y=${data.months.nextDate.year}&m=${data.months.nextDate.month}`}>
           <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
             <span>
               {data.months.nextDate.name} {data.months.nextDate.year}
             </span>
           </div>
-        </a>
+        </Link>
       </div>
       <div className="flex w-full flex-col gap-2">
         {data.events.map((value, index) => {
@@ -105,6 +110,39 @@ export default async function IndexPage({
       </div>
     </section>
   )
+}
+
+
+const now = new Date()
+now.setHours(0, 0, 0, 0)
+function isToday(day: string | undefined) {
+  if (!day) {
+    return false
+  }
+  const date = new Date(day)
+
+  if (now.getTime() == date.getTime()) {
+    return true
+  }
+
+  return false
+}
+
+function colorizeProper(day: dayInfo) {
+
+  if (isToday(day.day)) {
+    return '#7071E8'
+  }
+
+  if (day.dayColor == 'white') {
+    return 'hsl(var(--primary))'
+  }
+
+  if (day.dayColor == 'grey') {
+    return 'hsl(var(--muted-foreground))'
+  }
+
+  return day.dayColor
 }
 
 function getEventDates(starts: Date, ends: Date) {
@@ -146,7 +184,7 @@ function WeekCell(props: dayInfo) {
   return (
     <div className="flex md:h-16 h-10 w-full flex-col rounded-md">
       <div className="flex md:h-12 h-8 w-full flex-col items-center justify-center md:text-2xl text-md ">
-        <span style={{ color: props.dayColor }}>
+        <span style={{ color: colorizeProper(props), fontWeight: isToday(props.day) ? 'bold' : 'normal' }}>
           {new Date(props.day ?? "")?.getDate()}
         </span>
       </div>
