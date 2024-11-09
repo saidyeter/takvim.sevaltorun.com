@@ -1,11 +1,11 @@
 
-import { dayInfo, getEvents } from "@/lib/source-api"
-import Link from "next/link";
-import { getServerSession } from "next-auth";
+import { dayInfo, getEvents } from "@/lib/source-api";
 import {
   CalendarPlus as Create,
   PenBox as Edit
 } from "lucide-react";
+import { getServerSession } from "next-auth";
+import Link from "next/link";
 
 export default async function IndexPage({
   searchParams,
@@ -68,14 +68,14 @@ export default async function IndexPage({
         })}
       </div>
       <div className="flex w-full items-end justify-between my-4">
-        <Link href={`?y=${data.months.previousDate.year}&m=${data.months.previousDate.month}`}>
+        <Link prefetch={true} href={`?y=${data.months.previousDate.year}&m=${data.months.previousDate.month}`}>
           <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
             <span>
               {data.months.previousDate.name} {data.months.previousDate.year}
             </span>
           </div>
         </Link>
-        <Link href={`?y=${data.months.nextDate.year}&m=${data.months.nextDate.month}`}>
+        <Link prefetch={true} href={`?y=${data.months.nextDate.year}&m=${data.months.nextDate.month}`}>
           <div className="flex flex-col items-center justify-center text-lg text-muted-foreground hover:text-primary">
             <span>
               {data.months.nextDate.name} {data.months.nextDate.year}
