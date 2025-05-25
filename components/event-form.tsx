@@ -1,9 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
-import { useForm } from "react-hook-form";
-import z from 'zod'
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,12 +9,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { createEvent, updateEvent } from "@/lib/actions";
-import { createEventRequestSchema } from "@/lib/source-api";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import z from 'zod';
+
+const createEventRequestSchema = z.object({
+  starts: z.string().transform(p => new Date(p)),
+  ends: z.string().transform(p => new Date(p)),
+  desc: z.string()
+})
 
 const eventFormSchema = z.object({
   starts: z.string(),

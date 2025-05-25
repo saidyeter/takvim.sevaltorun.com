@@ -1,16 +1,20 @@
-import { and, gt, lt, or } from "drizzle-orm"
-import { z } from "zod"
-import { getMonths, getStartDayAndEndDayForMonth } from "./dater"
-import { db } from "./db"
-import { events } from "./db-schema"
+'use server'
+
+import { and, gt, lt, or } from "drizzle-orm";
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { z } from "zod";
+import { getMonths, getStartDayAndEndDayForMonth } from "./dater";
+import { events } from "./db-schema";
 
 const { env } = process
 const baseUrl = env.DB_API_URL
 const apiKey = env.DB_API_KEY ?? ''
 
+const db = drizzle(process.env?.DB_URL ?? '');
+
 export {
   createEvent, deleteEvent, getEvent, getEvents, updateEvent
-}
+};
 
 function beforeReq() {
   if (process.env.NODE_ENV == 'development') {
@@ -54,7 +58,7 @@ async function getEvents(year: number, month: number) {
           lt(events.ends_at, endDay)
         )
       ))
-    // console.log('yooo 3', allEvents);
+    console.log('yooo 3', allEvents);
 
     const weeks: dayInfo[][] = []
     let week: dayInfo[] = []
@@ -74,20 +78,23 @@ async function getEvents(year: number, month: number) {
       }
 
 
-      console.log('yooo 4', currentDayInfo);
+      // console.log('yooo 4', currentDayInfo);
 
 
       allEvents.
-        filter(e =>
-          !!e.starts_at && e.starts_at?.getTime() <= day.getTime() &&
-          !!e.ends_at && e.ends_at.getTime() >= day.getTime())
+        filter(e => checkInTheDay(e.starts_at, e.ends_at, currentDayStarting, currentDayEnding))
+
         .forEach(e => {
+          // console.log('yooo 5', e);
+
           const color = pickColor(e.id)
           currentDayInfo.info?.push(color)
-          eventsWithDayColor.push({
-            ...e,
-            dayColor: color
-          })
+          if (!eventsWithDayColor.some(v => v.id == e.id)) {
+            eventsWithDayColor.push({
+              ...e,
+              dayColor: color
+            })
+          }
 
         })
       week.push(currentDayInfo)
@@ -115,7 +122,7 @@ async function getEvents(year: number, month: number) {
   return undefined
 }
 
-export const createEventRequestSchema = z.object({
+const createEventRequestSchema = z.object({
   starts: z.string().transform(p => new Date(p)),
   ends: z.string().transform(p => new Date(p)),
   desc: z.string()
@@ -149,10 +156,10 @@ async function createEvent(req: TCreateEventRequestSchema) {
     if (res) {
       return true
     }
-    console.log("createNewQuestion", res)
+    console.log("createNew", res)
 
   } catch (error) {
-    console.log("createNewQuestion error", error);
+    console.log("createNew error", error);
   }
 
   return false
@@ -301,4 +308,49 @@ function isInTheMonth(day: Date | undefined, month: number) {
   }
 
   return false
+}
+
+
+/*
+senaryo 1
+starts_at: 22 mayis 07:00:00.000
+ends_at: 24 mayis 08:00:00.000
+currentDayStarting: 23 mayis 00:00:00.000
+currentDayEnding: 23 mayis 23:59:59.999
+
+senaryo 2
+starts_at: 22 mayis 07:00:00.000
+ends_at: 24 mayis 08:00:00.000
+currentDayStarting: 22 mayis 00:00:00.000
+currentDayEnding: 22 mayis 23:59:59.999
+*/
+
+
+function checkInTheDay(
+  starts_at: Date | null | undefined,
+  ends_at: Date | null | undefined,
+  currentDayStarting: Date,
+  currentDayEnding: Date
+) {
+
+  if (!starts_at || !ends_at) {
+    return false
+  }
+  if (
+    (currentDayStarting.getMonth() == starts_at.getMonth()
+      && currentDayStarting.getDate() == starts_at.getDate()) ||
+    (currentDayStarting.getMonth() == ends_at.getMonth()
+      && currentDayStarting.getDate() == ends_at.getDate()) ||
+    (currentDayEnding.getMonth() == starts_at.getMonth()
+      && currentDayEnding.getDate() == starts_at.getDate()) ||
+    (currentDayEnding.getMonth() == ends_at.getMonth()
+      && currentDayEnding.getDate() == ends_at.getDate())
+  ) {
+    return true
+  }
+
+  return (
+    starts_at.getTime() <= currentDayStarting.getTime() &&
+    ends_at.getTime() >= currentDayEnding.getTime()
+  )
 }
