@@ -52,9 +52,7 @@ export default async function IndexPage({
         </div>
         <div className="w-1/3 flex justify-end items-center">
           <Link href='/event/add'>
-            {!!user &&
-              <Create />
-            }
+            <Create />
           </Link>
         </div>
       </div>
