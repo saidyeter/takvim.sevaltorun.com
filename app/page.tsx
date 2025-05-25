@@ -12,7 +12,7 @@ export default async function IndexPage({
 }: {
   searchParams: { y: string; m: string }
 }) {
-  console.log('searchParams', searchParams);
+  // console.log('searchParams', searchParams);
 
   const user = await getServerSession()
   const now = new Date()
