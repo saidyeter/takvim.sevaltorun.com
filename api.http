@@ -1,0 +1,2 @@
+GET https://saidyeter.coinnect.com.tr/admin/getdb/takvim HTTP/1.1
+Authorization: cabd9224-1984-422b-8a3d-19b6f14935d6

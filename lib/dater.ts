@@ -67,17 +67,17 @@ function getMonths(year: number, month: number) {
 
 function getStartDayAndEndDayForMonth(year: number, month: number) {
   const { startWeekDay, monthLength } = getMonthLengthAndStartWeekDay(year, month)
-  console.log('getStartDayAndEndDayForMonth', year, month, startWeekDay, monthLength);
+  // console.log('getStartDayAndEndDayForMonth', year, month, startWeekDay, monthLength);
 
   const oneWeek = 7
   const sixWeeks = 6 * oneWeek
   const daysForOhterMonths = sixWeeks - monthLength
-  console.log('daysForOhterMonths', daysForOhterMonths);
+  // console.log('daysForOhterMonths', daysForOhterMonths);
 
   const daysForPrevMonth = startWeekDay - 1
-  console.log('daysForPrevMonth', daysForPrevMonth);
+  // console.log('daysForPrevMonth', daysForPrevMonth);
   const daysForNextMonth = daysForOhterMonths - daysForPrevMonth
-  console.log('daysForNextMonth', daysForNextMonth);
+  // console.log('daysForNextMonth', daysForNextMonth);
 
 
   const startDay = new Date(year, month - 1, 1)

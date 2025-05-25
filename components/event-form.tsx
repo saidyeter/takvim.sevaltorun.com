@@ -33,12 +33,17 @@ const eventFormSchema = z.object({
     path: ["starts"],
   })
 
+const editEventFormSchema = z.object({
+  starts: z.date().nullable().optional(),
+  ends: z.date().nullable().optional(),
+  desc: z.string().nullable().optional()
+})
 
 export type TEventFormSchema = z.infer<typeof eventFormSchema>;
 
 interface EventFormProps {
   role: 'add' | 'edit'
-  defaultVal?: TEventFormSchema,
+  defaultVal?: z.infer<typeof editEventFormSchema>,
   id?: number
 }
 
@@ -48,8 +53,8 @@ export default function EventForm(props: EventFormProps) {
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       desc: props.defaultVal?.desc ?? '',
-      starts: getLocaleDate(props.defaultVal?.starts ? new Date(props.defaultVal?.starts) : new Date()),
-      ends: getLocaleDate(props.defaultVal?.ends ? new Date(props.defaultVal?.ends) : new Date())
+      starts: getLocaleDate(props.defaultVal?.starts ?? new Date()),
+      ends: getLocaleDate(props.defaultVal?.ends ?? new Date())
     }
   });
 
@@ -57,7 +62,12 @@ export default function EventForm(props: EventFormProps) {
     if (props.role == 'add') {
       await createEvent(createEventRequestSchema.parse(data))
     } else if (props.role == 'edit') {
-      await updateEvent(props.id ?? -1, createEventRequestSchema.parse(data))
+      if (props.id) {
+        await updateEvent(props.id, createEventRequestSchema.parse(data))
+      }
+      else {
+        console.log('no id found', data);
+      }
     }
   };
 

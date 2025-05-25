@@ -1,7 +1,7 @@
-import Link from "next/link";
+import DeleteButton from "@/components/delete-button";
 import EventForm from "@/components/event-form";
 import { getEvent } from "@/lib/actions";
-import DeleteButton from "@/components/delete-button";
+import Link from "next/link";
 
 export default async function EditEventPage({ params }: { params: { id: string } }) {
   const eventId = parseInt(params.id)
@@ -13,6 +13,11 @@ export default async function EditEventPage({ params }: { params: { id: string }
   }
 
   const data = await getEvent(eventId)
+  if (!data) {
+    return (<div className="mb-4">Hatali bilgi. Geri dönmek için&nbsp;
+      <Link href="/" className="underline">tıklayınız</Link>
+    </div>)
+  }
 
   return (
     <>
@@ -25,7 +30,11 @@ export default async function EditEventPage({ params }: { params: { id: string }
           <DeleteButton id={eventId} />
         </span>
       </div>
-      <EventForm role="edit" defaultVal={data} id={eventId} />
+      <EventForm role="edit" defaultVal={{
+        starts: data.starts_at,
+        ends: data.ends_at,
+        desc: data.desc
+      }} id={eventId} />
     </>
   );
 }

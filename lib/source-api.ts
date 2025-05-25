@@ -1,14 +1,10 @@
 'use server'
 
-import { and, gt, lt, or } from "drizzle-orm";
+import { and, eq, gt, lt, or } from "drizzle-orm";
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { z } from "zod";
 import { getMonths, getStartDayAndEndDayForMonth } from "./dater";
 import { events } from "./db-schema";
-
-const { env } = process
-const baseUrl = env.DB_API_URL
-const apiKey = env.DB_API_KEY ?? ''
 
 const db = drizzle(process.env?.DB_URL ?? '');
 
@@ -44,7 +40,7 @@ async function getEvents(year: number, month: number) {
   try {
 
     const { startDay, endDay } = getStartDayAndEndDayForMonth(year, month)
-    console.log('yooo 2', startDay.toLocaleDateString(), endDay.toLocaleDateString());
+    // console.log('yooo 2', startDay.toLocaleDateString(), endDay.toLocaleDateString());
 
     const allEvents = await db
       .select()
@@ -58,7 +54,7 @@ async function getEvents(year: number, month: number) {
           lt(events.ends_at, endDay)
         )
       ))
-    console.log('yooo 3', allEvents);
+    // console.log('yooo 3', allEvents);
 
     const weeks: dayInfo[][] = []
     let week: dayInfo[] = []
@@ -131,7 +127,6 @@ export type TCreateEventRequestSchema = z.infer<typeof createEventRequestSchema>
 
 async function createEvent(req: TCreateEventRequestSchema) {
   beforeReq()
-  // const url = encodeURI(baseUrl + "/takvim/event")
   const values: typeof events.$inferInsert = {
     starts_at: req.starts,
     ends_at: req.ends,
@@ -139,19 +134,7 @@ async function createEvent(req: TCreateEventRequestSchema) {
     created_at: new Date(),
   }
   try {
-    // const response = await fetch(url, {
-    //     method: "POST",
-    //     headers: {
-    //         'content-type': 'application/json',
-    //         'Authorization': apiKey
-    //     },
-    //     body: JSON.stringify(req),
-    //     cache: 'no-cache'
-    // })
-
     const [res] = await db.insert(events).values(values).returning()
-
-
 
     if (res) {
       return true
@@ -167,19 +150,12 @@ async function createEvent(req: TCreateEventRequestSchema) {
 
 async function deleteEvent(id: number) {
   beforeReq()
-  const url = encodeURI(baseUrl + "/takvim/event/" + id)
   try {
-    const response = await fetch(url, {
-      method: "DELETE",
-      headers: {
-        'Authorization': apiKey
-      },
-      cache: 'no-cache'
-    })
-    if (response.ok) {
+    const response = await db.delete(events).where(eq(events.id, id)).returning()
+    if (response) {
       return true
     }
-    console.log("deleteEvent", response.status, await response.text(), url)
+    console.log("deleteEvent error")
 
   } catch (error) {
     console.log("deleteEvent error", error);
@@ -190,22 +166,9 @@ async function deleteEvent(id: number) {
 
 async function getEvent(id: number) {
   beforeReq()
-  const url = encodeURI(baseUrl + "/takvim/event/" + id)
   try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        'Authorization': apiKey
-      },
-      cache: 'no-cache'
-    })
-    // console.log("getEvent222", response.status, await response.text(), url)
-    if (response.ok) {
-      const data = await response.json()
-      return data as event
-    }
-    console.log("getEvent", response.status, await response.text(), url)
-
+    const [response] = await db.select().from(events).where(eq(events.id, id))
+    return response
   } catch (error) {
     console.log("getEvent error", error);
   }
@@ -215,21 +178,12 @@ async function getEvent(id: number) {
 
 async function updateEvent(id: number, req: TCreateEventRequestSchema) {
   beforeReq()
-  const url = encodeURI(baseUrl + "/takvim/event/" + id)
   try {
-    const response = await fetch(url, {
-      method: "PATCH",
-      headers: {
-        'content-type': 'application/json',
-        'Authorization': apiKey
-      },
-      body: JSON.stringify(req),
-      cache: 'no-cache'
-    })
-    if (response.ok) {
+    const [response] = await db.update(events).set(req).where(eq(events.id, id)).returning()
+    if (response) {
       return true
     }
-    console.log("updateEvent", response.status, await response.text(), url)
+    console.log("updateEvent error")
 
   } catch (error) {
     console.log("updateEvent error", error);
