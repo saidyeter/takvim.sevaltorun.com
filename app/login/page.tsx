@@ -1,13 +1,12 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { signIn } from 'next-auth/react'
-import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import z from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from 'next-auth/react';
+import { useSearchParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import z from 'zod';
 
 const signInSchema = z.object({
   pincode: z.string()
@@ -29,6 +28,7 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: TSignInSchema) => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     await signIn('credentials', {
       pincode: data.pincode,
       callbackUrl
@@ -39,8 +39,6 @@ export default function LoginPage() {
   return (
     <div className="w-1/2 m-auto pt-4">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-2">
-
-
         <Input
           {...register("pincode")}
           type="password"

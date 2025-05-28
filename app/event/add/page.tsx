@@ -1,7 +1,7 @@
-import Link from "next/link";
 import EventForm from "@/components/event-form";
+import Link from "next/link";
 
-export default function AddEventPage() {
+export default async function AddEventPage() {
 
   return (
     <>

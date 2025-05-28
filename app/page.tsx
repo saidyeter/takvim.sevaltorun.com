@@ -12,6 +12,8 @@ export default async function IndexPage({
 }: {
   searchParams: { y: string; m: string }
 }) {
+  // console.log('searchParams', searchParams);
+
   const user = await getServerSession()
   const now = new Date()
   const year =
@@ -34,7 +36,7 @@ export default async function IndexPage({
 
   const data = await getEvents(year, month)
   if (!data) {
-    return <>bir hata olustu</>
+    return <div>bir hata olustu</div>
   }
 
   return (
@@ -50,9 +52,7 @@ export default async function IndexPage({
         </div>
         <div className="w-1/3 flex justify-end items-center">
           <Link href='/event/add'>
-            {!!user &&
-              <Create />
-            }
+            <Create />
           </Link>
         </div>
       </div>
@@ -89,12 +89,12 @@ export default async function IndexPage({
             <div
               key={index}
               className='flex w-full flex-row rounded-lg border-l-8 bg-muted p-2 pl-4'
-              style={{ borderColor: value.dayColor }}
+              style={{ borderColor: value.dayColor ?? '' }}
             >
               <div className='flex w-2/3 flex-col gap-1'>
 
                 <p className="text-muted-foreground">
-                  {getEventDates(new Date(value.starts), new Date(value.ends))}
+                  {getEventDates(new Date(value.starts_at ?? ''), new Date(value.ends_at ?? ''))}
                 </p>
                 <p className="font-semibold">{value.desc}</p>
 
@@ -110,39 +110,6 @@ export default async function IndexPage({
       </div>
     </section>
   )
-}
-
-
-const now = new Date()
-now.setHours(0, 0, 0, 0)
-function isToday(day: string | undefined) {
-  if (!day) {
-    return false
-  }
-  const date = new Date(day)
-
-  if (now.getTime() == date.getTime()) {
-    return true
-  }
-
-  return false
-}
-
-function colorizeProper(day: dayInfo) {
-
-  if (isToday(day.day)) {
-    return '#7071E8'
-  }
-
-  if (day.dayColor == 'white') {
-    return 'hsl(var(--primary))'
-  }
-
-  if (day.dayColor == 'grey') {
-    return 'hsl(var(--muted-foreground))'
-  }
-
-  return day.dayColor
 }
 
 function getEventDates(starts: Date, ends: Date) {
@@ -184,8 +151,8 @@ function WeekCell(props: dayInfo) {
   return (
     <div className="flex md:h-16 h-10 w-full flex-col rounded-md">
       <div className="flex md:h-12 h-8 w-full flex-col items-center justify-center md:text-2xl text-md ">
-        <span style={{ color: colorizeProper(props), fontWeight: isToday(props.day) ? 'bold' : 'normal' }}>
-          {new Date(props.day ?? "")?.getDate()}
+        <span style={{ color: props.isToday ? '#7071E8' : props.dayColor, fontWeight: props.isToday ? 'bold' : 'normal' }}>
+          {props.day}
         </span>
       </div>
       <div className="flex md:h-4 h-2 w-full flex-row items-center justify-evenly">

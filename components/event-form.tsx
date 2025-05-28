@@ -1,9 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
-import { useForm } from "react-hook-form";
-import z from 'zod'
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,12 +9,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { createEvent, updateEvent } from "@/lib/actions";
-import { createEventRequestSchema } from "@/lib/source-api";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import z from 'zod';
+
+const createEventRequestSchema = z.object({
+  starts: z.string().transform(p => new Date(p)),
+  ends: z.string().transform(p => new Date(p)),
+  desc: z.string()
+})
 
 const eventFormSchema = z.object({
   starts: z.string(),
@@ -30,12 +33,17 @@ const eventFormSchema = z.object({
     path: ["starts"],
   })
 
+const editEventFormSchema = z.object({
+  starts: z.date().nullable().optional(),
+  ends: z.date().nullable().optional(),
+  desc: z.string().nullable().optional()
+})
 
 export type TEventFormSchema = z.infer<typeof eventFormSchema>;
 
 interface EventFormProps {
   role: 'add' | 'edit'
-  defaultVal?: TEventFormSchema,
+  defaultVal?: z.infer<typeof editEventFormSchema>,
   id?: number
 }
 
@@ -45,8 +53,8 @@ export default function EventForm(props: EventFormProps) {
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       desc: props.defaultVal?.desc ?? '',
-      starts: getLocaleDate(props.defaultVal?.starts ? new Date(props.defaultVal?.starts) : new Date()),
-      ends: getLocaleDate(props.defaultVal?.ends ? new Date(props.defaultVal?.ends) : new Date())
+      starts: getLocaleDate(props.defaultVal?.starts ?? new Date()),
+      ends: getLocaleDate(props.defaultVal?.ends ?? new Date())
     }
   });
 
@@ -54,7 +62,12 @@ export default function EventForm(props: EventFormProps) {
     if (props.role == 'add') {
       await createEvent(createEventRequestSchema.parse(data))
     } else if (props.role == 'edit') {
-      await updateEvent(props.id ?? -1, createEventRequestSchema.parse(data))
+      if (props.id) {
+        await updateEvent(props.id, createEventRequestSchema.parse(data))
+      }
+      else {
+        console.log('no id found', data);
+      }
     }
   };
 
